@@ -999,6 +999,10 @@ YY_RULE_SETUP
 { scanner_badtoken (yytext);
                   return yylval_token (NUMBER); }
 	YY_BREAK
+case 18:
+YY_RULE_SETUP
+#line 35 "scanner.l"
+{ return yylval_token (EQUALSEQUALS); }
 case 16:
 YY_RULE_SETUP
 #line 48 "scanner.l"

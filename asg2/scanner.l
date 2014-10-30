@@ -42,6 +42,15 @@ IDENT           ({LETTER}({LETTER}|{DIGIT})*)
 ")"             { return yylval_token (')'); }
 ";"             { return yylval_token (';'); }
 
+"."             { return yylval_token ('.'); }
+","             { return yylval_token (','); }
+"%"             { return yylval_token ('%'); }
+"!"             { return yylval_token ('!'); }
+"["             { return yylval_token ('['); }
+"]"             { return yylval_token (']'); }
+"{"             { return yylval_token ('{'); }
+"}"             { return yylval_token ('}'); }
+
 {NOTNUMBER}     { scanner_badtoken (yytext);
                   return yylval_token (NUMBER); }
 
