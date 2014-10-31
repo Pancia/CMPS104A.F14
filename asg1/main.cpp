@@ -1,7 +1,6 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <fstream>
 
 #include <assert.h>
 #include <errno.h>
@@ -22,18 +21,10 @@ int scan_opts(int argc, char** argv) {
         option = getopt(argc, argv, "ly@:");
         if (option == EOF) break;
         switch (option) {
-            case '@': 
-                set_debugflags(optarg);          
-                break;
-            case 'l': 
-                cout << "scan_opts: l\n";        
-                break;
-            case 'y': 
-                cout << "scan_opts: y\n";        
-                break;
-            default:  
-                errprintf("%:bad option (%c)\n", optopt);   
-                break;
+            case '@': set_debugflags(optarg);                      break;
+            case 'l': cout << "scan_opts: l\n";                     break;
+            case 'y': cout << "scan_opts: y\n";                     break;
+            default:  errprintf("%:bad option (%c)\n", optopt);     break;
         }
     }
     if (optind > argc) {
@@ -69,8 +60,7 @@ void cpplines (FILE* pipe, char* filename) {
         int sscanf_rc = sscanf(buffer, "# %d \"%[^\"]\"",
                                 &linenr, filename);
         if (sscanf_rc == 2) {
-            DEBUGF('f', "DIRECTIVE: line %d file \"%s\"\n", 
-                linenr, filename);
+            DEBUGF('f', "DIRECTIVE: line %d file \"%s\"\n", linenr, filename);
             continue;
         }
         char* savepos = NULL;
@@ -90,26 +80,22 @@ void cpplines (FILE* pipe, char* filename) {
 
 int main(int argc, char** argv) {
     set_execname (argv[0]);
-    int optind = scan_opts(argc, argv);
-    filebuf fb; 
+    int new_argc = scan_opts(argc, argv);
     
-    char* filename = argv[optind];
-    string out_file = string(filename) + ".str";
-    string command = CPP + " " + filename;
-    fb.open(out_file, std::ios::out);
-    ostream os(&fb);
-    
-    DEBUGF('f', "command=\"%s\"\n", command.c_str());
-    FILE* pipe = popen(command.c_str(), "r");
-    if (pipe == NULL) {
-        syserrprintf(command.c_str());
-    } else {
-        cpplines(pipe, filename);
-        int pclose_rc = pclose(pipe);
-        eprint_status(command.c_str(), pclose_rc);
+    for (int argi = new_argc; argi < argc; ++argi) {
+        char* filename = argv[argi];
+        string command = CPP + " " + filename;
+        DEBUGF('f', "command=\"%s\"\n", command.c_str());
+        FILE* pipe = popen(command.c_str(), "r");
+        if (pipe == NULL) {
+            syserrprintf(command.c_str());
+        } else {
+            cpplines(pipe, filename);
+            int pclose_rc = pclose (pipe);
+            eprint_status(command.c_str(), pclose_rc);
+        }
     }
-    dump_stringset(os);
-    fb.close();
-        
+    dump_stringset(cout);
+    
     return get_exitstatus();
 }
