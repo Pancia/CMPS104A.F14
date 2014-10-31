@@ -22,7 +22,7 @@ static void* yycalloc (size_t size);
 
 /* %destructor { error_destructor ($$); } <> */
 
-%token  ROOT IDENT NUMBER EQEQ
+%token ROOT IDENT NUMBER EQEQ BRKKRB NOTEQ LSTEQ GRTEQ VOID BOOL CHAR INT STRING STRUCT IF ELSE WHILE RETURN FALSE TRUE NIL ORD CHR NEW CHARCONST STRCONST BADIDENT
 
 %right  '='
 %left   '+' '-'

@@ -63,7 +63,6 @@ int main(int argc, char** argv) {
         }
     }
     //dump_stringset(cout);
-    cout << "FUCK" << endl;
     
     return get_exitstatus();
 }
