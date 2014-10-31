@@ -1,4 +1,3 @@
-// $Id: foo1.oh,v 1.2 2011-09-29 19:06:34-07 - - $
 __FILE__ __LINE__ __DATE__ __TIME__
 foo1.h, line 3.
 foo1.h, line 4.

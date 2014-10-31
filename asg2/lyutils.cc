@@ -87,7 +87,8 @@ void scanner_include (void) {
       errprintf ("%: %d: [%s]: invalid directive, ignored\n",
                  scan_rc, yytext);
    } else {
-      printf (";# %d \"%s\"\n", linenr, filename);
+      DEBUGF ('u', ";# %d \"%s\"\n", linenr, filename);
+      printf ("# %d \"%s\"\n", linenr, filename);
       scanner_newfilename (filename);
       scan_linenr = linenr - 1;
       DEBUGF ('m', "filename=%s, scan_linenr=%d\n",

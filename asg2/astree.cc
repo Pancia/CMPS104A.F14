@@ -17,6 +17,23 @@ astree* new_astree (int symbol, int filenr, int linenr, int offset,
    tree->linenr = linenr;
    tree->offset = offset;
    tree->lexinfo = intern_stringset (lexinfo);
+   char symbol_name[80]; 
+   memset(&symbol_name[0], 0, sizeof(symbol_name));
+   string yytname = get_yytname (tree->symbol);
+   if (yytname == "$undefined") {
+      char s[15];
+      memset (&s[0], 0, sizeof(s)); 
+      sprintf(s, "%s", tree->lexinfo->c_str()); 
+      strcat (symbol_name, "\'");
+      strcat (symbol_name, s);
+      strcat (symbol_name, "\'");
+   } else {
+      strcat (symbol_name, get_yytname (tree->symbol));
+   }
+   printf ("  %2d  %02d.%03d  %3d  %-10s  (%s)\n",
+	   tree->filenr, tree->linenr, tree->offset,
+	   tree->symbol, symbol_name, 
+	   tree->lexinfo->c_str());
    DEBUGF ('f', "astree %p->{%d:%d.%d: %s: \"%s\"}\n",
            tree, tree->filenr, tree->linenr, tree->offset,
            get_yytname (tree->symbol), tree->lexinfo->c_str());

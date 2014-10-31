@@ -1,4 +1,3 @@
-
 #include <stdio.h>
 #include <assert.h>
 
@@ -47,12 +46,11 @@ void emit_assign (astree* tree) {
    if (left->symbol != IDENT) {
       eprintf ("%:%s: %d: left operand of `=' is not an identifier\n",
                scanner_filename (left->filenr)->c_str(), left->linenr);
-   }else{
+   } else {
       emit_insn ("popvar", left->lexinfo->c_str(), left);
    }
 }
 
-
 void emit (astree* tree) {
    switch (tree->symbol) {
       case ROOT  : postorder_emit_stmts (tree);       break;
@@ -75,6 +73,4 @@ void emit_sm_code (astree* tree) {
    printf ("\n");
    if (tree) emit (tree);
 }
-
-RCSC("$Id: emit.cc,v 1.3 2013-09-20 17:52:13-07 - - $")
 

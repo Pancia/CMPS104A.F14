@@ -47,6 +47,16 @@ void scan(char* filename) {
     }
 }
 
+/*
+   # 16 "foobar.oc"
+      2  16.003  264  TOK_KW_RETURN   (return)
+      2  16.010   61  '='             (=)
+      2  20.008  258  TOK_IDENT       (hello)
+      2  20.010  271  TOK_LIT_INT     (1234)
+      2  25.002  123  '{'             ({)
+      2  26.008  272  TOK_LIT_STRING  ("beep")
+*/
+
 int main(int argc, char** argv) {
     set_execname (argv[0]);
     int new_argc = scan_opts(argc, argv);

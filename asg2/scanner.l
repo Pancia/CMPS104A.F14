@@ -8,12 +8,12 @@
 %}
 
 %option 8bit
-%option debug
+/*%option debug*/
 %option nodefault
 %option nounput
 %option noyywrap
-%option verbose
-%option warn
+/*%option verbose*/
+/*%option warn*/
 
 LETTER          [A-Za-z_]
 DIGIT           [0-9]
