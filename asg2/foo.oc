@@ -7,5 +7,5 @@ foo.oc, line 5.
 /* Comment */ on line 7
 FOO1 + FOO2;
 foo.oc, line 9, last line.
-
+==
 

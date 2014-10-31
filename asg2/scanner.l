@@ -22,6 +22,7 @@ EXPONENT        ([Ee][+-]?{DIGIT}+)
 NUMBER          ({MANTISSA}{EXPONENT}?)
 NOTNUMBER       ({MANTISSA}[Ee][+-]?)
 IDENT           ({LETTER}({LETTER}|{DIGIT})*)
+EQEQ            (==)
 
 %%
 
@@ -31,6 +32,7 @@ IDENT           ({LETTER}({LETTER}|{DIGIT})*)
 
 {NUMBER}        { return yylval_token (NUMBER); }
 {IDENT}         { return yylval_token (IDENT); }
+{EQEQ}          { return yylval_token (EQEQ); }
 
 "="             { return yylval_token ('='); }
 "+"             { return yylval_token ('+'); }

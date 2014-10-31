@@ -22,7 +22,7 @@ static void* yycalloc (size_t size);
 
 /* %destructor { error_destructor ($$); } <> */
 
-%token  ROOT IDENT NUMBER
+%token  ROOT IDENT NUMBER EQEQ
 
 %right  '='
 %left   '+' '-'
