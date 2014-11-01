@@ -4,6 +4,8 @@
 // Lex and Yacc interface utility.
 
 #include <stdio.h>
+#include <iostream>
+#include <fstream>
 
 #include "astree.h"
 #include "auxlib.h"
@@ -18,26 +20,28 @@ extern int yy_flex_debug;
 extern int yydebug;
 extern unsigned long yyleng;
 
-int yylex (void);
-int yyparse (void);
-void yyerror (const char* message);
-int yylex_destroy (void);
-const char* get_yytname (int symbol);
-bool is_defined_token (int symbol);
+extern ofstream tok_file;
 
-const string* scanner_filename (int filenr);
-void scanner_newfilename (const char* filename);
-void scanner_badchar (unsigned char bad);
-void scanner_badtoken (char* lexeme);
-void scanner_newline (void);
-void scanner_setecho (bool echoflag);
-void scanner_useraction (void);
+int yylex(void);
+int yyparse(void);
+void yyerror(const char* message);
+int yylex_destroy(void);
+const char* get_yytname(int symbol);
+bool is_defined_token(int symbol);
 
-astree* new_parseroot (void);
-int yylval_token (int symbol);
-void error_destructor (astree*);
+const string* scanner_filename(int filenr);
+void scanner_newfilename(const char* filename);
+void scanner_badchar(unsigned char bad);
+void scanner_badtoken(char* lexeme);
+void scanner_newline(void);
+void scanner_setecho(bool echoflag);
+void scanner_useraction(void);
 
-void scanner_include (void);
+astree* new_parseroot(void);
+int yylval_token(int symbol);
+void error_destructor(astree*);
+
+void scanner_include(void);
 
 typedef astree* astree_pointer;
 #define YYSTYPE astree_pointer

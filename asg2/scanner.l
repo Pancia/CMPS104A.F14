@@ -43,6 +43,8 @@ NEW 		(new)
 CHARCONST 	('([^\\'\n]|\\[\\'"0nt])')
 STRCONST 	(\"([^\\"\n]|\\[\\'"0nt])*\")
 BADIDENT 	({DIGIT}+{IDENT})
+BADSTRCONST     (\"([^\\"\n]|\\[\\'"0nt])*\n)
+BADCHARCONST    ('([^\\'\n]|\\[\\'"0nt])\n)
 
 /* TODO
 //invalid character and string constants (missing a final quote or
@@ -107,7 +109,10 @@ BADIDENT 	({DIGIT}+{IDENT})
 
 {BADIDENT} 	{ scanner_badtoken (yytext);
 		  return yylval_token (BADIDENT); }
-
+{BADSTRCONST}   { scanner_badtoken (yytext);
+		  return yylval_token (BADSTRCONST); }
+{BADCHARCONST}  { scanner_badtoken (yytext);
+		  return yylval_token (BADCHARCONST); }
 .               { scanner_badchar (*yytext); }
 
 %%
