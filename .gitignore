@@ -1,1 +1,17 @@
 asg2/oc
+
+*.o
+
+*.str
+
+*.tok
+
+*.output
+
+asg2/yylex.cc
+
+asg2/yyparse.cc
+
+asg2/yyparse.h
+
+*.deps

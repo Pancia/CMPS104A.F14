@@ -90,18 +90,15 @@ clean :
 	- rm ${OBJECTS} ${ALLGENS} ${REPORTS} ${DEPSFILE} core
 	- rm ${foreach test, ${TESTINS:.in=}, \
 		${patsubst %, ${test}.%, out err}}
-
 spotless : clean
-	- rm ${EXECBIN} List.*.ps List.*.pdf
+	- rm ${EXECBIN} List.*.ps List.*.pdf *.str *.tok
 
-
 #
 # Build the dependencies file using the C preprocessor
 #
 deps : ${ALLCSRC}
 	@ echo "# ${DEPSFILE} created `date` by ${MAKE}" >${DEPSFILE}
 	${MKDEPS} ${ALLCSRC} >>${DEPSFILE}
-
 ${DEPSFILE} :
 	@ touch ${DEPSFILE}
 	${MAKE} --no-print-directory deps
@@ -109,11 +106,9 @@ ${DEPSFILE} :
 #
 # Test
 #
-
 tests : ${EXECBIN}
 	touch ${TESTINS}
 	make --no-print-directory ${TESTINS:.in=.out}
-
 %.out %.err : %.in ${EXECBIN}
 	( ${VALGRIND} ${EXECBIN} -ly -@@ $< \
 	;  echo EXIT STATUS $$? 1>&2 \
@@ -124,7 +119,6 @@ tests : ${EXECBIN}
 #
 again :
 	gmake --no-print-directory spotless deps ci all lis
-	
 ifeq "${NEEDINCL}" ""
 include ${DEPSFILE}
 endif

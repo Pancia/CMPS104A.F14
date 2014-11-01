@@ -22,7 +22,7 @@ static void* yycalloc (size_t size);
 
 /* %destructor { error_destructor ($$); } <> */
 
-%token ROOT IDENT NUMBER EQEQ BRKKRB NOTEQ LSTEQ GRTEQ VOID BOOL CHAR INT STRING STRUCT IF ELSE WHILE RETURN FALSE TRUE NIL ORD CHR NEW CHARCONST STRCONST BADIDENT BADSTRCONST BADCHARCONST
+%token ROOT TOK_IDENT TOK_NUMBER TOK_EQEQ TOK_BRKKRB TOK_NOTEQ TOK_LSTEQ TOK_GRTEQ TOK_VOID TOK_BOOL TOK_CHAR TOK_INT TOK_STRING TOK_STRUCT TOK_IF TOK_ELSE TOK_WHILE TOK_RETURN TOK_FALSE TOK_TRUE TOK_NIL TOK_ORD TOK_CHR TOK_NEW TOK_CHARCONST TOK_STRCONST TOK_BADIDENT TOK_BADSTRCONST TOK_BADCHARCONST
 
 %right  '='
 %left   '+' '-'
@@ -52,8 +52,8 @@ expr    : expr '=' expr         { $$ = adopt2 ($2, $1, $3); }
         | '+' expr %prec POS    { $$ = adopt1sym ($1, $2, POS); }
         | '-' expr %prec NEG    { $$ = adopt1sym ($1, $2, NEG); }
         | '(' expr ')'          { free_ast2 ($1, $3); $$ = $2; }
-        | IDENT                 { $$ = $1; }
-        | NUMBER                { $$ = $1; }
+        | TOK_IDENT                 { $$ = $1; }
+        | TOK_NUMBER                { $$ = $1; }
         ;
 
 %%

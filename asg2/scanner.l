@@ -15,105 +15,94 @@
 /*%option verbose*/
 /*%option warn*/
 
-LETTER          [A-Za-z_]
-DIGIT           [0-9]
-NUMBER          ({DIGIT}+)
-IDENT           ({LETTER}({LETTER}|{DIGIT})*)
-EQEQ            (==)
-BRKKRB          (\[\]) 
-NOTEQ 	        (!=)  
-LSTEQ 	        (<=)  
-GRTEQ 	        (>=)
-VOID 		(void)
-BOOL 		(bool) 
-CHAR  		(char) 
-INT  		(int) 
-STRING  	(string) 
-STRUCT  	(struct) 
-IF  		(if) 
-ELSE  		(else) 
-WHILE  		(while) 
-RETURN 		(return) 
-FALSE  		(false) 
-TRUE  		(true) 
-NIL  		(null) 
-ORD  		(ord) 
-CHR  		(chr) 
-NEW 		(new)
-CHARCONST 	('([^\\'\n]|\\[\\'"0nt])')
-STRCONST 	(\"([^\\"\n]|\\[\\'"0nt])*\")
-BADIDENT 	({DIGIT}+{IDENT})
-BADSTRCONST     (\"([^\\"\n]|\\[\\'"0nt])*\n)
-BADCHARCONST    ('([^\\'\n]|\\[\\'"0nt])\n)
-
-/* TODO
-//invalid character and string constants (missing a final quote or
-//a character following an escape).  Make sure the scanner report
-//does not show any jamming states.
-*/
+TOK_BADCHARCONST    	('([^\\'\n]|\\[\\'"0nt])\n)
+TOK_BADIDENT 		({TOK_DIGIT}+{TOK_IDENT})
+TOK_BADSTRCONST     	(\"([^\\"\n]|\\[\\'"0nt])*\n)
+TOK_BOOL 		(bool) 
+TOK_BRKKRB          	(\[\]) 
+TOK_CHAR  		(char) 
+TOK_CHARCONST 		('([^\\'\n]|\\[\\'"0nt])')
+TOK_CHR  		(chr) 
+TOK_DIGIT           	[0-9]
+TOK_ELSE  		(else) 
+TOK_EQEQ            	(==)
+TOK_FALSE  		(false) 
+TOK_GRTEQ 	        (>=)
+TOK_IDENT           	({TOK_LETTER}({TOK_LETTER}|{TOK_DIGIT})*)
+TOK_IF  		(if) 
+TOK_INT  		(int) 
+TOK_LETTER          	[A-Za-z_]
+TOK_LSTEQ 	        (<=)  
+TOK_NEW 		(new)
+TOK_NIL  		(null) 
+TOK_NOTEQ 	        (!=)  
+TOK_NUMBER          	({TOK_DIGIT}+)
+TOK_ORD  		(ord) 
+TOK_RETURN 		(return) 
+TOK_STRCONST 		(\"([^\\"\n]|\\[\\'"0nt])*\")
+TOK_STRING  		(string) 
+TOK_STRUCT  		(struct) 
+TOK_TRUE  		(true) 
+TOK_VOID 		(void)
+TOK_WHILE  		(while) 
 
 %%
 
-"#".*           { scanner_include(); }
-[ \t]+          { IGNORE (white space) }
-\n              { scanner_newline(); }
+"#".*           	{ scanner_include(); }
+[ \t]+          	{ IGNORE (white space) }
+\n              	{ scanner_newline(); }
 
-{VOID} 		{ return yylval_token (VOID); }	
-{BOOL} 		{ return yylval_token (BOOL); } 
-{CHAR}  	{ return yylval_token (CHAR); }
-{INT}  		{ return yylval_token (INT); }
-{STRING}  	{ return yylval_token (STRING); }
-{STRUCT}  	{ return yylval_token (STRUCT); }
-{IF}  		{ return yylval_token (IF); }
-{ELSE}  	{ return yylval_token (ELSE); }
-{WHILE}  	{ return yylval_token (WHILE); }
-{RETURN} 	{ return yylval_token (RETURN); }
-{FALSE}  	{ return yylval_token (FALSE); }
-{TRUE}  	{ return yylval_token (TRUE); }
-{NIL}   	{ return yylval_token (NIL); }
-{ORD}  		{ return yylval_token (ORD); }
-{CHR}  		{ return yylval_token (CHR); }
-{NEW} 		{ return yylval_token (NEW); }
+"!"             	{ return yylval_token ('!'); }
+"%"             	{ return yylval_token ('%'); }
+"("             	{ return yylval_token ('('); }
+")"             	{ return yylval_token (')'); }
+"*"             	{ return yylval_token ('*'); }
+"+"             	{ return yylval_token ('+'); }
+","             	{ return yylval_token (','); }
+"-"             	{ return yylval_token ('-'); }
+"."             	{ return yylval_token ('.'); }
+"/"             	{ return yylval_token ('/'); }
+";"             	{ return yylval_token (';'); }
+"="             	{ return yylval_token ('='); }
+"["             	{ return yylval_token ('['); }
+"]"             	{ return yylval_token (']'); }
+"^"             	{ return yylval_token ('^'); }
+"{"             	{ return yylval_token ('{'); }
+"}"             	{ return yylval_token ('}'); }
 
-{CHARCONST} 	{ return yylval_token (CHARCONST); }
-{STRCONST} 	{ return yylval_token (STRCONST); }
+{TOK_BOOL} 		{ return yylval_token (TOK_BOOL); } 
+{TOK_BRKKRB}        	{ return yylval_token (TOK_BRKKRB); }
+{TOK_CHARCONST} 	{ return yylval_token (TOK_CHARCONST); }
+{TOK_CHAR}  		{ return yylval_token (TOK_CHAR); }
+{TOK_CHR}  		{ return yylval_token (TOK_CHR); }
+{TOK_ELSE}  		{ return yylval_token (TOK_ELSE); }
+{TOK_EQEQ}          	{ return yylval_token (TOK_EQEQ); }
+{TOK_FALSE}  		{ return yylval_token (TOK_FALSE); }
+{TOK_GRTEQ}         	{ return yylval_token (TOK_GRTEQ); }
+{TOK_IDENT}         	{ return yylval_token (TOK_IDENT); }
+{TOK_IF}  		{ return yylval_token (TOK_IF); }
+{TOK_INT}  		{ return yylval_token (TOK_INT); }
+{TOK_LSTEQ}         	{ return yylval_token (TOK_LSTEQ); }
+{TOK_NEW} 		{ return yylval_token (TOK_NEW); }
+{TOK_NIL}   		{ return yylval_token (TOK_NIL); }
+{TOK_NOTEQ}         	{ return yylval_token (TOK_NOTEQ); }
+{TOK_NUMBER}        	{ return yylval_token (TOK_NUMBER); }
+{TOK_ORD}  		{ return yylval_token (TOK_ORD); }
+{TOK_RETURN} 		{ return yylval_token (TOK_RETURN); }
+{TOK_STRCONST} 		{ return yylval_token (TOK_STRCONST); }
+{TOK_STRING}  		{ return yylval_token (TOK_STRING); }
+{TOK_STRUCT}  		{ return yylval_token (TOK_STRUCT); }
+{TOK_TRUE}  		{ return yylval_token (TOK_TRUE); }
+{TOK_VOID} 		{ return yylval_token (TOK_VOID); }	
+{TOK_WHILE}  		{ return yylval_token (TOK_WHILE); }
 
-{NUMBER}        { return yylval_token (NUMBER); }
-
-{IDENT}         { return yylval_token (IDENT); }
-
-{EQEQ}          { return yylval_token (EQEQ); }
-{BRKKRB}        { return yylval_token (BRKKRB); }
-{NOTEQ}         { return yylval_token (NOTEQ); }
-{LSTEQ}         { return yylval_token (LSTEQ); }
-{GRTEQ}         { return yylval_token (GRTEQ); }
-
-"="             { return yylval_token ('='); }
-"+"             { return yylval_token ('+'); }
-"-"             { return yylval_token ('-'); }
-"*"             { return yylval_token ('*'); }
-"/"             { return yylval_token ('/'); }
-"^"             { return yylval_token ('^'); }
-"("             { return yylval_token ('('); }
-")"             { return yylval_token (')'); }
-";"             { return yylval_token (';'); }
-
-"."             { return yylval_token ('.'); }
-","             { return yylval_token (','); }
-"%"             { return yylval_token ('%'); }
-"!"             { return yylval_token ('!'); }
-"["             { return yylval_token ('['); }
-"]"             { return yylval_token (']'); }
-"{"             { return yylval_token ('{'); }
-"}"             { return yylval_token ('}'); }
-
-{BADIDENT} 	{ scanner_badtoken (yytext);
-		  return yylval_token (BADIDENT); }
-{BADSTRCONST}   { scanner_badtoken (yytext);
-		  return yylval_token (BADSTRCONST); }
-{BADCHARCONST}  { scanner_badtoken (yytext);
-		  return yylval_token (BADCHARCONST); }
-.               { scanner_badchar (*yytext); }
+{TOK_BADIDENT} 		{ scanner_badtoken (yytext);
+		  	  return yylval_token (TOK_BADIDENT); }
+{TOK_BADSTRCONST}   	{ scanner_badtoken (yytext);
+		  	  return yylval_token (TOK_BADSTRCONST); }
+{TOK_BADCHARCONST}  	{ scanner_badtoken (yytext);
+		  	  return yylval_token (TOK_BADCHARCONST); }
+.               	{ scanner_badchar (*yytext); }
 
 %%
 
