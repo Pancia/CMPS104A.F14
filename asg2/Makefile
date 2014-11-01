@@ -1,5 +1,3 @@
-# $Id: Makefile,v 1.11 2013-10-15 16:37:56-07 - - $
-
 MKFILE    = Makefile
 DEPSFILE  = ${MKFILE}.deps
 NOINCLUDE = ci clean spotless
@@ -54,7 +52,6 @@ ${EXECBIN} : ${OBJECTS}
 %.o : %.cc
 	${GCC} -c $<
 
-
 #
 # Build the scanner.
 #
@@ -72,7 +69,7 @@ ${CYGEN} ${HYGEN} : ${YSOURCES}
 # Submit the files.
 # 
 submit :
-	submit cmps104a-wm.f14 asg2 {ALLSRC}
+	submit cmps104a-wm.f14 asg2 ${ALLSRC}
 
 #
 # Make a listing from all of the sources
