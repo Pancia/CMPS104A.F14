@@ -20,18 +20,18 @@ void dump_stringset (ostream& out) {
         size_t curr_size = set.bucket_size (bucket);
         if (max_bucket_size < curr_size) max_bucket_size = curr_size;
         for (stringset::const_local_iterator itor = set.cbegin (bucket);
-             itor != set.cend (bucket); ++itor) {
+                itor != set.cend (bucket); ++itor) {
             if (need_index) out << "stringset[" << setw(4) << bucket
                 << "]: ";
             else out << setw(17) << "";
             need_index = false;
             const string* str = &*itor;
             out << setw(22) << set.hash_function()(*str) << ": "
-            << str << "->\"" << *str << "\"" << endl;
+                << str << "->\"" << *str << "\"" << endl;
         }
     }
     out << "load_factor = " << fixed << setprecision(3)
-    << set.load_factor() << endl;
+        << set.load_factor() << endl;
     out << "bucket_count = " << set.bucket_count() << endl;
     out << "max_bucket_size = " << max_bucket_size << endl;
 }
