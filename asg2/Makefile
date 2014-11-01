@@ -69,10 +69,10 @@ ${CYGEN} ${HYGEN} : ${YSOURCES}
 	bison --defines=${HYGEN} --output=${CYGEN} ${YSOURCES}
 
 #
-# Check sources into an RCS subdirectory.
-#
-ci : ${ALLSRC} ${TESTINS}
-	cid + ${ALLSRC} ${TESTINS} test?.inh
+# Submit the files.
+# 
+submit :
+	submit cmps104a-wm.f14 asg2 {ALLSRC}
 
 #
 # Make a listing from all of the sources
