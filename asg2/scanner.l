@@ -8,12 +8,12 @@
 %}
 
 %option 8bit
-/*%option debug*/
+%option debug
 %option nodefault
 %option nounput
 %option noyywrap
-/*%option verbose*/
-/*%option warn*/
+%option verbose
+%option warn
 
 TOK_BADCHARCONST ('([^\\'\n]|\\[\\'"0nt])\n)
 TOK_BADIDENT     ({TOK_DIGIT}+{TOK_IDENT})
