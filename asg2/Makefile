@@ -67,7 +67,7 @@ ${CYGEN} ${HYGEN} : ${YSOURCES}
 
 #
 # Submit the files.
-# 
+#
 submit :
 	submit cmps104a-wm.f14 asg2 ${ALLSRC}
 
