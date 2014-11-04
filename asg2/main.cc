@@ -23,13 +23,13 @@ int scan_opts(int argc, char** argv) {
         option = getopt(argc, argv, "ly@:");
         if(option == EOF) break;
         switch(option) {
-            case '@': set_debugflags(optarg);                      
+            case '@': set_debugflags(optarg);
                       break;
-            case 'l': yy_flex_debug = 1;                           
+            case 'l': yy_flex_debug = 1;
                       break;
-            case 'y': yydebug = 1;                                 
+            case 'y': yydebug = 1;
                       break;
-            default:  errprintf("%:bad option(%c)\n", optopt);    
+            default:  errprintf("%:bad option(%c)\n", optopt);
                       break;
         }
     }
@@ -51,7 +51,7 @@ void scan(char* filename) {
         int token = yylex();
         if(token == YYEOF)
             return;
-        DEBUGF('m', "token=%d", token);   	 
+        DEBUGF('m', "token=%d", token);
     }
     tok_file.close();
 }
