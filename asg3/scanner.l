@@ -79,7 +79,6 @@ TOK_WHILE        (while)
 {TOK_EQEQ}       { return yylval_token (TOK_EQEQ); }
 {TOK_FALSE}      { return yylval_token (TOK_FALSE); }
 {TOK_GRTEQ}      { return yylval_token (TOK_GRTEQ); }
-{TOK_IDENT}      { return yylval_token (TOK_IDENT); }
 {TOK_IF}         { return yylval_token (TOK_IF); }
 {TOK_INT}        { return yylval_token (TOK_INT); }
 {TOK_LSTEQ}      { return yylval_token (TOK_LSTEQ); }
@@ -95,6 +94,7 @@ TOK_WHILE        (while)
 {TOK_TRUE}       { return yylval_token (TOK_TRUE); }
 {TOK_VOID}       { return yylval_token (TOK_VOID); }
 {TOK_WHILE}      { return yylval_token (TOK_WHILE); }
+{TOK_IDENT}      { return yylval_token (TOK_IDENT); }
 
 {TOK_BADIDENT}     { scanner_badtoken (yytext);
                      return yylval_token (TOK_BADIDENT); }

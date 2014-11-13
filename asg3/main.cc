@@ -43,8 +43,12 @@ int scan_opts(int argc, char** argv) {
 const string CPP = "/usr/bin/cpp";
 
 void scan(char* filename) {
+    string delimiter =".";
+    size_t pos = 0;
+    string str_fname = filename;
+    pos = str_fname.find(delimiter);
+    string fname = str_fname.substr(0, pos);
     DEBUGF('m', "filename=%s", filename);
-    string fname = filename;
     tok_file.open(fname + ".tok", ios::out);
     assert(tok_file.is_open());
     for(;;) {
@@ -68,7 +72,10 @@ void scan(char* filename) {
 
 int main(int argc, char** argv) {
     set_execname(argv[0]);
+    int parsecode = 0;
     int new_argc = scan_opts(argc, argv);
+    scanner_setecho (want_echo());
+    parsecode = yyparse();
 
     for(int argi = new_argc; argi < argc; ++argi) {
         char* filename = argv[argi];
@@ -81,11 +88,21 @@ int main(int argc, char** argv) {
             scan(filename);
         }
         ofstream str_file;
-        string fname = filename;
+        string delimiter =".";
+        size_t pos = 0;
+        string str_fname = filename;
+        pos = str_fname.find(delimiter);
+        string fname = str_fname.substr(0, pos);
         str_file.open(fname + ".str", ios::out);
         dump_stringset(str_file);
         str_file.close();
-    }
 
+        if (parsecode) {
+            errprintf ("%:parse failed (%d)\n", parsecode);
+        } else {
+            DEBUGSTMT ('a', dump_astree (stderr, yyparse_astree); );
+            emit_sm_code (yyparse_astree);
+        }
+    }
     return get_exitstatus();
 }
