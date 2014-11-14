@@ -1,8 +1,0 @@
-if TOK_IFELSE 13:1.0
-   / TOK_BINOP 13:1.6
-      5 TOK_NUMBER 13:1.4
-      + TOK_BINOP 13:1.10
-         2 TOK_NUMBER 13:1.8
-         0 TOK_NUMBER 13:1.12
-   true TOK_TRUE 13:2.4
-   false TOK_FALSE 13:4.4

@@ -33,7 +33,7 @@ static void* yycalloc (size_t size);
 %token TOK_NEWARRAY TOK_CALL TOK_INDEX TOK_COMP
 
 %right  '='
-%left   TOK_COMP
+%left   TOK_EQEQ TOK_NOTEQ TOK_LSTEQ TOK_GRTEQ TOK_GRT TOK_LST
 %left   '+' '-'
 %left   '*' '/' '%'
 %right  POS "u+" NEG "u-"
@@ -105,13 +105,36 @@ return    : TOK_RETURN ';' { free_ast2 ($1, $2); $$ = upd_tree_symbol($1, TOK_RE
           | TOK_RETURN expr ';' { free_ast ($3); $$ = adopt1 ($1, $2); }
           ;
 
-expr      : expr TOK_BINOP expr { $$ = adopt2 ($2, $1, $3); }
-          | TOK_UNOP expr { $$ = adopt1 ($1, $2); }
+expr      : binopexpr { $$ = $1; }
+          | unopexpr { $$ = $1; }
           | allocator { $$ = $1; }
           | call { $$ = $1; }
           | '(' expr ')' { free_ast2 ($1, $3); $$ = $2; }
           | variable { $$ = $1; }
           | constant { $$ = $1; }
+          ;
+
+binopexpr : expr '=' expr { $$ = adopt2 ($2, $1, $3); }
+          | expr '+' expr { $$ = adopt2 ($2, $1, $3); }
+          | expr '-' expr { $$ = adopt2 ($2, $1, $3); }
+          | expr '*' expr { $$ = adopt2 ($2, $1, $3); }
+          | expr '/' expr { $$ = adopt2 ($2, $1, $3); }
+          | expr '%' expr { $$ = adopt2 ($2, $1, $3); }
+          | expr TOK_EQEQ expr { $$ = adopt2 ($2, $1, $3); }
+          | expr TOK_LST expr { $$ = adopt2 ($2, $1, $3); }
+          | expr TOK_GRT expr { $$ = adopt2 ($2, $1, $3); }
+          | expr TOK_GRTEQ expr { $$ = adopt2 ($2, $1, $3); }
+          | expr TOK_LSTEQ expr { $$ = adopt2 ($2, $1, $3); }
+          | expr TOK_NOTEQ expr { $$ = adopt2 ($2, $1, $3); }
+          | expr TOK_NEW expr { $$ = adopt2 ($2, $1, $3); }
+          ;
+
+unopexpr  : '+' expr { $$ = adopt1 ($1, $2); }
+          | '-' expr { $$ = adopt1 ($1, $2); }
+          | '!' expr { $$ = adopt1 ($1, $2); }
+          | TOK_NEW expr { $$ = adopt1 ($1, $2); }
+          | TOK_ORD expr { $$ = adopt1 ($1, $2); }
+          | TOK_CHR expr { $$ = adopt1 ($1, $2); }
           ;
 
 allocator : TOK_NEW TOK_IDENT '(' ')' { free_ast3 ($1, $3, $4);

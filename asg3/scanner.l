@@ -18,9 +18,6 @@
 TOK_BADCHARCONST ('([^\\'\n]|\\[\\'"0nt])\n)
 TOK_BADIDENT     ({TOK_DIGIT}+{TOK_IDENT})
 TOK_BADSTRCONST  (\"([^\\"\n]|\\[\\'"0nt])*\n)
-TOK_COMP         ({TOK_EQEQ}|{TOK_NOTEQ}|<|{TOK_LSTEQ}|{TOK_GRTEQ}|>)
-TOK_OPER         (\+|\-|\/|\*|\%|\=)
-TOK_BINOP        ({TOK_COMP}|{TOK_OPER})
 TOK_BOOL         (bool)
 TOK_BRKKRB       (\[\])
 TOK_CHAR         (char)
@@ -30,11 +27,13 @@ TOK_DIGIT        [0-9]
 TOK_ELSE         (else)
 TOK_EQEQ         (==)
 TOK_FALSE        (false)
+TOK_GRT          (>)
 TOK_GRTEQ        (>=)
 TOK_IDENT        ({TOK_LETTER}({TOK_LETTER}|{TOK_DIGIT})*)
 TOK_IF           (if)
 TOK_INT          (int)
 TOK_LETTER       [A-Za-z_]
+TOK_LST          (<)
 TOK_LSTEQ        (<=)
 TOK_NEW          (new)
 TOK_NIL          (null)
@@ -55,6 +54,12 @@ TOK_WHILE        (while)
 [ \t]+           { IGNORE (white space) }
 \n               { scanner_newline(); }
 
+"+"              { return yylval_token ('+'); }
+"-"              { return yylval_token ('-'); }
+"/"              { return yylval_token ('/'); }
+"*"              { return yylval_token ('*'); }
+"%"              { return yylval_token ('%'); }
+
 "!"              { return yylval_token ('!'); }
 "("              { return yylval_token ('('); }
 ")"              { return yylval_token (')'); }
@@ -68,7 +73,6 @@ TOK_WHILE        (while)
 "}"              { return yylval_token ('}'); }
 "="              { return yylval_token ('='); }
 
-{TOK_BINOP}      { return yylval_token (TOK_BINOP); }
 {TOK_BOOL}       { return yylval_token (TOK_BOOL); }
 {TOK_BRKKRB}     { return yylval_token (TOK_BRKKRB); }
 {TOK_CHARCONST}  { return yylval_token (TOK_CHARCONST); }
@@ -77,9 +81,11 @@ TOK_WHILE        (while)
 {TOK_ELSE}       { return yylval_token (TOK_ELSE); }
 {TOK_EQEQ}       { return yylval_token (TOK_EQEQ); }
 {TOK_FALSE}      { return yylval_token (TOK_FALSE); }
+{TOK_GRT}        { return yylval_token (TOK_GRT); }
 {TOK_GRTEQ}      { return yylval_token (TOK_GRTEQ); }
 {TOK_IF}         { return yylval_token (TOK_IF); }
 {TOK_INT}        { return yylval_token (TOK_INT); }
+{TOK_LST}        { return yylval_token (TOK_LST); }
 {TOK_LSTEQ}      { return yylval_token (TOK_LSTEQ); }
 {TOK_NEW}        { return yylval_token (TOK_NEW); }
 {TOK_NIL}        { return yylval_token (TOK_NIL); }
