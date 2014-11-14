@@ -1,4 +1,4 @@
-asg2/oc
+oc
 
 *.o
 
@@ -6,12 +6,14 @@ asg2/oc
 
 *.tok
 
+*.ast
+
 *.output
 
-asg2/yylex.cc
+yylex.cc
 
-asg2/yyparse.cc
+yyparse.cc
 
-asg2/yyparse.h
+yyparse.h
 
 *.deps
