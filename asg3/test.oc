@@ -1,4 +1,4 @@
-if (5 / 2 + 0)
+if (5 / 2 + 0 > 2)
     true;
 else
     false;

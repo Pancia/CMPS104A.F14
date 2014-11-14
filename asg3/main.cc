@@ -60,32 +60,32 @@ void scan(char* filename) {
     tok_file.close();
 }
 
-string yyin_cpp_popen (char* filename) {
+string yyin_cpp_popen(char* filename) {
     string yyin_cpp_command;
 
     yyin_cpp_command = CPP;
     yyin_cpp_command += " ";
     yyin_cpp_command += filename;
-    yyin = popen (yyin_cpp_command.c_str(), "r");
-    if (yyin == NULL) {
-        syserrprintf (yyin_cpp_command.c_str());
-        exit (get_exitstatus());
+    yyin = popen(yyin_cpp_command.c_str(), "r");
+    if(yyin == NULL) {
+        syserrprintf(yyin_cpp_command.c_str());
+        exit(get_exitstatus());
     }
 
     return yyin_cpp_command;
 }
 
-void yyin_cpp_pclose (string filename) {
-    int pclose_rc = pclose (yyin);
-    eprint_status (filename.c_str(), pclose_rc);
-    if (pclose_rc != 0) set_exitstatus (EXIT_FAILURE);
+void yyin_cpp_pclose(string filename) {
+    int pclose_rc = pclose(yyin);
+    eprint_status(filename.c_str(), pclose_rc);
+    if(pclose_rc != 0) set_exitstatus(EXIT_FAILURE);
 }
 
 int main(int argc, char** argv) {
     set_execname(argv[0]);
     int parsecode = 0;
     int new_argc = scan_opts(argc, argv);
-    //scanner_setecho (want_echo());
+    //scanner_setecho(want_echo());
 
     for(int argi = new_argc; argi < argc; ++argi) {
         char* filename = argv[argi];
@@ -111,11 +111,11 @@ int main(int argc, char** argv) {
         parsecode = yyparse();
         yyin_cpp_pclose(filename);
 
-        if (parsecode) {
-            errprintf ("%:parse failed (%d)\n", parsecode);
+        if(parsecode) {
+            errprintf("%:parse failed(%d)\n", parsecode);
         } else {
-            DEBUGSTMT ('a', dump_astree (stderr, yyparse_astree); );
-            //emit_sm_code (yyparse_astree);
+            DEBUGSTMT('a', dump_astree(stderr, yyparse_astree); );
+            //emit_sm_code(yyparse_astree);
             ofstream ast_file;
             ast_file.open(fname + ".ast", ios::out);
             write_astree(ast_file, yyparse_astree);
