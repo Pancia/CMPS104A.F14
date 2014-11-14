@@ -18,7 +18,7 @@ extern int yyin_linenr;
 extern char* yytext;
 extern int yy_flex_debug;
 extern int yydebug;
-extern int yyleng;
+extern unsigned long yyleng;
 
 extern ofstream tok_file;
 
@@ -38,6 +38,7 @@ void scanner_setecho(bool echoflag);
 void scanner_useraction(void);
 
 astree* new_parseroot(void);
+astree* new_custom_astree(int TOK, string name, astree* copy);
 int yylval_token(int symbol);
 void error_destructor(astree*);
 

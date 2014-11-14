@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include <assert.h>
 #include <inttypes.h>
 #include <stdarg.h>
@@ -17,13 +19,13 @@ astree* new_astree(int symbol, int filenr, int linenr, int offset,
     tree->linenr = linenr;
     tree->offset = offset;
     tree->lexinfo = intern_stringset(lexinfo);
-    char symbol_name[64]; 
+    char symbol_name[64];
     memset(&symbol_name[0], 0, sizeof(symbol_name));
     string yytname = get_yytname(tree->symbol);
     if(yytname == "$undefined") {
         char s[16];
-        memset(&s[0], 0, sizeof(s)); 
-        sprintf(s, "\'%s\'", tree->lexinfo->c_str()); 
+        memset(&s[0], 0, sizeof(s));
+        sprintf(s, "\'%s\'", tree->lexinfo->c_str());
         strcat(symbol_name, s);
     } else {
         strcat(symbol_name, get_yytname(tree->symbol));
@@ -32,7 +34,7 @@ astree* new_astree(int symbol, int filenr, int linenr, int offset,
     memset(&buf[0], 0, sizeof(buf));
     sprintf(buf, "  %2d  %02d.%03d  %3d  %-16s (%s)\n",
             tree->filenr, tree->linenr, tree->offset,
-            tree->symbol, symbol_name, 
+            tree->symbol, symbol_name,
             tree->lexinfo->c_str());
     tok_file << buf;
     DEBUGF('f', "astree %p->{%d:%d.%d: %s: \"%s\"}\n",
@@ -55,10 +57,37 @@ astree* adopt2(astree* root, astree* left, astree* right) {
     return root;
 }
 
+astree* adopt3(astree* root, astree* left, astree* middle, astree* right) {
+    adopt1(root, left);
+    adopt1(root, middle);
+    adopt1(root, right);
+    return root;
+}
+
+astree* adopt4(astree* root, astree* c1, astree* c2, astree* c3, astree* c4) {
+    adopt1(root, c1);
+    adopt1(root, c2);
+    adopt1(root, c3);
+    adopt1(root, c4);
+    return root;
+}
+
 astree* adopt1sym(astree* root, astree* child, int symbol) {
     root = adopt1(root, child);
     root->symbol = symbol;
     return root;
+}
+
+astree* adopt2sym(astree* root, astree* child1, astree* child2, int symbol) {
+    root = adopt1(root, child1);
+    root = adopt1(root, child2);
+    root->symbol = symbol;
+    return root;
+}
+
+astree* upd_tree_symbol(astree* tree, int symbol) {
+    tree->symbol = symbol;
+    return tree;
 }
 
 static void dump_node(FILE* outfile, astree* node) {
@@ -90,6 +119,32 @@ void dump_astree(FILE* outfile, astree* root) {
     fflush(NULL);
 }
 
+static void write_node(ofstream& out, astree* node) {
+    out << get_yytname(node->symbol) << " "
+        << node->filenr << ":" << node->linenr << "." << node->offset;
+    bool need_space = false;
+    //wtf is this for?
+    /*for(size_t child = 0; child < node->children.size(); ++child) {
+        if(need_space)
+            out << " ";
+        need_space = true;
+    }*/
+}
+
+static void write_astree_rec(ofstream& out, astree* root, int depth) {
+    if(root == NULL) return;
+    out << std::string(depth * 3, ' ') << root->lexinfo->c_str() << " ";
+    write_node(out, root);
+    out << endl;
+    for(size_t child = 0; child < root->children.size(); ++child) {
+        write_astree_rec(out, root->children[child], depth + 1);
+    }
+}
+
+void write_astree(ofstream& out, astree* root) {
+    write_astree_rec(out, root, 0);
+}
+
 void yyprint(FILE* outfile, unsigned short toknum, astree* yyvaluep) {
     DEBUGF('f', "toknum = %d, yyvaluep = %p\n", toknum, yyvaluep);
     if(is_defined_token(toknum)) {
@@ -115,5 +170,11 @@ void free_ast(astree* root) {
 void free_ast2(astree* tree1, astree* tree2) {
     free_ast(tree1);
     free_ast(tree2);
+}
+
+void free_ast3(astree* tree1, astree* tree2, astree* tree3) {
+    free_ast(tree1);
+    free_ast(tree2);
+    free_ast(tree3);
 }
 

@@ -75,6 +75,13 @@ void error_destructor(astree* tree) {
 
 astree* new_parseroot(void) {
     yyparse_astree = new_astree(ROOT, 0, 0, 0, "<<ROOT>>");
+    DEBUGF('r', "ROOT");
+    return yyparse_astree;
+}
+
+astree* new_custom_astree(int TOK, string name, astree* copy) {
+    yyparse_astree = new_astree(TOK, copy->filenr, copy->linenr, copy->offset, name.c_str());
+    DEBUGF('r', "yyparse_astree");
     return yyparse_astree;
 }
 

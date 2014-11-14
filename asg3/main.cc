@@ -60,22 +60,32 @@ void scan(char* filename) {
     tok_file.close();
 }
 
-/*
-# 16 "foobar.oc"
-2  16.003  264  TOK_KW_RETURN  (return)
-2  16.010   61  '='            (=)
-2  20.008  258  TOK_IDENT      (hello)
-2  20.010  271  TOK_LIT_INT    (1234)
-2  25.002  123  '{'            ({)
-2  26.008  272  TOK_LIT_STRING ("beep")
-*/
+string yyin_cpp_popen (char* filename) {
+    string yyin_cpp_command;
+
+    yyin_cpp_command = CPP;
+    yyin_cpp_command += " ";
+    yyin_cpp_command += filename;
+    yyin = popen (yyin_cpp_command.c_str(), "r");
+    if (yyin == NULL) {
+        syserrprintf (yyin_cpp_command.c_str());
+        exit (get_exitstatus());
+    }
+
+    return yyin_cpp_command;
+}
+
+void yyin_cpp_pclose (string filename) {
+    int pclose_rc = pclose (yyin);
+    eprint_status (filename.c_str(), pclose_rc);
+    if (pclose_rc != 0) set_exitstatus (EXIT_FAILURE);
+}
 
 int main(int argc, char** argv) {
     set_execname(argv[0]);
     int parsecode = 0;
     int new_argc = scan_opts(argc, argv);
-    scanner_setecho (want_echo());
-    parsecode = yyparse();
+    //scanner_setecho (want_echo());
 
     for(int argi = new_argc; argi < argc; ++argi) {
         char* filename = argv[argi];
@@ -88,7 +98,7 @@ int main(int argc, char** argv) {
             scan(filename);
         }
         ofstream str_file;
-        string delimiter =".";
+        string delimiter = ".";
         size_t pos = 0;
         string str_fname = filename;
         pos = str_fname.find(delimiter);
@@ -97,11 +107,18 @@ int main(int argc, char** argv) {
         dump_stringset(str_file);
         str_file.close();
 
+        yyin_cpp_popen(filename);
+        parsecode = yyparse();
+        yyin_cpp_pclose(filename);
+
         if (parsecode) {
             errprintf ("%:parse failed (%d)\n", parsecode);
         } else {
             DEBUGSTMT ('a', dump_astree (stderr, yyparse_astree); );
-            emit_sm_code (yyparse_astree);
+            //emit_sm_code (yyparse_astree);
+            ofstream ast_file;
+            ast_file.open(fname + ".ast", ios::out);
+            write_astree(ast_file, yyparse_astree);
         }
     }
     return get_exitstatus();
