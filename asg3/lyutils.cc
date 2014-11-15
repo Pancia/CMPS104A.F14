@@ -85,6 +85,24 @@ astree* new_custom_astree(int TOK, string name, astree* copy) {
     return yyparse_astree;
 }
 
+astree* kidnap_children(astree* kidnapper, astree* root) {
+    DEBUGF('k', "root->symbol=%d", root->symbol);
+    if (root->symbol != kidnapper->symbol) {
+        adopt1(kidnapper, root);
+        return kidnapper;
+    }
+
+    DEBUGF('m', "KIDNAP_CHILDREN\n");
+    DEBUGSTMT('a', dump_astree(stdout, kidnapper););
+    DEBUGSTMT('a', dump_astree(stdout, root););
+    for (vector<astree*>::iterator it = root->children.begin(); it != root->children.end(); ++it) {
+        adopt1(kidnapper, *it);
+    }
+    DEBUGSTMT('a', dump_astree(stdout, kidnapper););
+
+    return kidnapper;
+}
+
 void scanner_include(void) {
     scanner_newline();
     char filename[strlen(yytext) + 1];

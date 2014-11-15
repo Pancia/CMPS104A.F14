@@ -39,6 +39,7 @@ void scanner_useraction(void);
 
 astree* new_parseroot(void);
 astree* new_custom_astree(int TOK, string name, astree* copy);
+astree* kidnap_children(astree* kidnapper, astree* root);
 int yylval_token(int symbol);
 void error_destructor(astree*);
 
