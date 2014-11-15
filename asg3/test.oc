@@ -1,8 +1,10 @@
+int fac (int n, char x);
+
 void spam (int x) {
     if (5 / 2 + !1 > 2) {
         int x = baz[2];
     } else {
-        y.foo = bar("FOO");
+        y.foo = fac(5);
         int z = new foo();
         return true;
     }

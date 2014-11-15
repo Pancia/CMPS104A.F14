@@ -31,7 +31,7 @@ static void* yycalloc(size_t size);
 %token TOK_IFELSE TOK_BINOP TOK_TYPEID TOK_UNOP TOK_FIELD
 %token TOK_FUNCTION TOK_DECLID TOK_RETURNVOID TOK_NEWSTRING
 %token TOK_NEWARRAY TOK_CALL TOK_INDEX TOK_COMP TOK_BLOCK
-%token TOK_PARAM TOK_RECEXPR CALL
+%token TOK_PARAM TOK_RECEXPR CALL TOK_PARAMLIST
 
 %right  '='
 %left   TOK_EQEQ TOK_NOTEQ TOK_LSTEQ TOK_GRTEQ TOK_GRT TOK_LST
@@ -74,13 +74,12 @@ fielddecl : basetype TOK_BRKKRB TOK_IDENT ';' { free_ast($4); $$ = adopt2($2, $1
 
 function  : identdecl '(' rec_identdecl ')' block
                                               { free_ast($4);
-                                                $$ = adopt3(new_custom_astree(TOK_FUNCTION, "FUNCTION", $1), $1, kidnap_children(upd_tree_symbol($2, TOK_PARAM), $3), $5); }
+                                                $$ = adopt3(new_custom_astree(TOK_FUNCTION, "FUNCTION", $1), $1, kidnap_children(upd_tree_symbol($2, TOK_PARAMLIST), $3), $5); }
           | identdecl '(' ')' block           { free_ast2($2, $3);
                                                 $$ = adopt2(new_custom_astree(TOK_FUNCTION, "FUNCTION", $1), $1, $4); }
           ;
 
-rec_identdecl : rec_identdecl identdecl       { $$ = adopt1(kidnap_children(new_custom_astree(TOK_PARAM, "PARAM", $1), $1), $2); }
-              | rec_identdecl ',' identdecl   { $$ = adopt1(kidnap_children(new_custom_astree(TOK_PARAM, "PARAM", $1), $1), $3); free_ast($2); }
+rec_identdecl : rec_identdecl ',' identdecl   { $$ = adopt1(kidnap_children(new_custom_astree(TOK_PARAMLIST, "PARAMLIST", $1), $1), $3); free_ast($2); }
               | identdecl                     { $$ = $1; }
               ;
 
