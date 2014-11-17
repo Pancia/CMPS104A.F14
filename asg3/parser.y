@@ -32,12 +32,14 @@ static void* yycalloc(size_t size);
 %token TOK_FUNCTION TOK_DECLID TOK_RETURNVOID TOK_NEWSTRING
 %token TOK_NEWARRAY TOK_CALL TOK_INDEX TOK_COMP TOK_BLOCK
 %token TOK_PARAM TOK_RECEXPR CALL TOK_PARAMLIST
+%token TOK_PROTOTYPE
 
-%right  '='
-%left   TOK_EQEQ TOK_NOTEQ TOK_LSTEQ TOK_GRTEQ TOK_GRT TOK_LST
-%left   '+' '-'
-%left   '*' '/' '%'
-%right  POS "u+" NEG "u-"
+%right TOK_IF TOK_ELSE
+%right '='
+%left  TOK_EQEQ TOK_NOTEQ TOK_LSTEQ TOK_GRTEQ TOK_GRT TOK_LST
+%left  '+' '-'
+%left  '*' '/' '%'
+%right POS "u+" NEG "u-"
 
 %start  program
 
@@ -77,6 +79,14 @@ function  : identdecl '(' rec_identdecl ')' block
                                                 $$ = adopt3(new_custom_astree(TOK_FUNCTION, "FUNCTION", $1), $1, kidnap_children(upd_tree_symbol($2, TOK_PARAMLIST), $3), $5); }
           | identdecl '(' ')' block           { free_ast2($2, $3);
                                                 $$ = adopt2(new_custom_astree(TOK_FUNCTION, "FUNCTION", $1), $1, $4); }
+          | prototype                         { $$ = $1; }
+          ;
+
+prototype : identdecl '(' rec_identdecl ')' ';'
+                                              { free_ast2($4, $5);
+                                                $$ = kidnap_children(upd_tree_symbol($1, TOK_PROTOTYPE), $3);}
+          | identdecl '(' ')' ';'             { free_ast3($2, $3, $4);
+                                                $$ = upd_tree_symbol($1, TOK_PROTOTYPE);}
           ;
 
 rec_identdecl : rec_identdecl ',' identdecl   { $$ = adopt1(kidnap_children(new_custom_astree(TOK_PARAMLIST, "PARAMLIST", $1), $1), $3); free_ast($2); }
@@ -108,11 +118,10 @@ rec_statement : rec_statement statement       { $$ = adopt1(
                                                     new_custom_astree(TOK_BLOCK, "BLOCK", $1), $1)
                                                 , $2); }
               | statement                     { $$ = $1; }
-              |                               { }
               ;
 
 block     : '{' rec_statement '}'             { free_ast($3); $$ = kidnap_children(new_custom_astree(TOK_BLOCK, "{", $1), $2); }
-          | '{' '}'                           { free_ast2($1, $2); }
+          | '{' '}'                           { $$ = new_custom_astree(TOK_BLOCK, "{", $1); free_ast2($1, $2); }
           | ';'                               { free_ast($1); }
           ;
 

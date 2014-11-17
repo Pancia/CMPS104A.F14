@@ -11,8 +11,7 @@
 #include "stringset.h"
 #include "lyutils.h"
 
-astree* new_astree(int symbol, int filenr, int linenr, int offset,
-        const char* lexinfo) {
+astree* new_astree(int symbol, int filenr, int linenr, int offset, const char* lexinfo) {
     astree* tree = new astree();
     tree->symbol = symbol;
     tree->filenr = filenr;
