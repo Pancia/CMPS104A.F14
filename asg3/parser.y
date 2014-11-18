@@ -22,7 +22,7 @@ static void* yycalloc(size_t size);
 
 /* %destructor { error_destructor($$); } <> */
 
-%token ROOT TOK_IDENT TOK_NUMBER TOK_EQEQ TOK_BRKKRB
+%token TOK_ROOT TOK_IDENT TOK_NUMBER TOK_EQEQ TOK_BRKKRB
 %token TOK_NOTEQ TOK_LSTEQ TOK_GRTEQ TOK_VOID TOK_BOOL
 %token TOK_CHAR TOK_INT TOK_STRING TOK_STRUCT TOK_IF
 %token TOK_ELSE TOK_WHILE TOK_RETURN TOK_FALSE TOK_TRUE
@@ -49,7 +49,7 @@ program   : rec_start                   { yyparse_astree = $1; }
 
 rec_start : rec_start start             { $$ = adopt1(
                                                 kidnap_children(
-                                                new_custom_astree(ROOT,
+                                                new_custom_astree(TOK_ROOT,
                                                     "<<ROOT>>", $1), $1)
                                                 , $2); }
           | start                       { $$ = $1; }
