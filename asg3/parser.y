@@ -233,15 +233,12 @@ binopexpr : expr '=' expr               { $$ = adopt2($2, $1, $3); }
           | expr TOK_NEW expr           { $$ = adopt2($2, $1, $3); }
           ;
 
-unopexpr  : '+' TOK_IDENT               { $$ = adopt1($1, $2); }
-          | '+' TOK_NUMBER              { $$ = adopt1($1, $2); }
-          | '-' TOK_IDENT               { $$ = adopt1($1, $2); }
-          | '-' TOK_NUMBER              { $$ = adopt1($1, $2); }
-          | '!' TOK_IDENT               { $$ = adopt1($1, $2); }
-          | '!' TOK_NUMBER              { $$ = adopt1($1, $2); }
-          | TOK_NEW TOK_IDENT           { $$ = adopt1($1, $2); }
-          | TOK_ORD TOK_IDENT           { $$ = adopt1($1, $2); }
-          | TOK_CHR TOK_IDENT           { $$ = adopt1($1, $2); }
+unopexpr  : '+' expr                    { $$ = adopt1($1, $2); }
+          | '-' expr                    { $$ = adopt1($1, $2); }
+          | '!' expr                    { $$ = adopt1($1, $2); }
+          | TOK_NEW expr                { $$ = adopt1($1, $2); }
+          | TOK_ORD expr                { $$ = adopt1($1, $2); }
+          | TOK_CHR expr                { $$ = adopt1($1, $2); }
           ;
 
 allocator : TOK_NEW TOK_IDENT '(' ')'   { free_ast2($3, $4);
