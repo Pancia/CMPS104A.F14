@@ -80,7 +80,8 @@ astree* new_parseroot(void) {
 }
 
 astree* new_custom_astree(int TOK, string name, astree* copy) {
-    yyparse_astree = new_astree(TOK, copy->filenr, copy->linenr, copy->offset, name.c_str());
+    yyparse_astree = new_astree(TOK, copy->filenr, copy->linenr,
+                                copy->offset, name.c_str());
     DEBUGF('r', "yyparse_astree");
     return yyparse_astree;
 }
@@ -95,7 +96,8 @@ astree* kidnap_children(astree* kidnapper, astree* root) {
     DEBUGF('m', "KIDNAP_CHILDREN\n");
     DEBUGSTMT('a', dump_astree(stdout, kidnapper););
     DEBUGSTMT('a', dump_astree(stdout, root););
-    for (vector<astree*>::iterator it = root->children.begin(); it != root->children.end(); ++it) {
+    for (vector<astree*>::iterator it = root->children.begin();
+            it != root->children.end(); ++it) {
         adopt1(kidnapper, *it);
     }
     DEBUGSTMT('a', dump_astree(stdout, kidnapper););
