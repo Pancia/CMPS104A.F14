@@ -125,12 +125,13 @@ rec_identdecl : rec_identdecl ',' identdecl
               | identdecl               { $$ = $1; }
               ;
 
-identdecl : basetype TOK_BRKKRB TOK_IDE { $$ = adopt2($2, $1,
-                                               upd_tree_symbol($3,
-                                                    TOK_DECLID)); }
+identdecl : basetype TOK_BRKKRB TOK_IDENT
+                                        { $$ = adopt2($2, $1,
+                                              upd_tree_symbol($3,
+                                                   TOK_DECLID)); }
           | basetype TOK_IDENT          { $$ = adopt1($1,
-                                                upd_tree_symbol($2,
-                                                    TOK_DECLID)); }
+                                              upd_tree_symbol($2,
+                                                   TOK_DECLID)); }
           ;
 
 statement : block                       { $$ = $1; }
@@ -179,7 +180,8 @@ while     : TOK_WHILE '(' expr ')' statement
                                           $$ = adopt2($1, $3, $5); }
           ;
 
-ifelse    : TOK_IF '(' expr ')' stateme { free_ast2($2, $4);
+ifelse    : TOK_IF '(' expr ')' statement
+                                        { free_ast2($2, $4);
                                           $$ = adopt2($1, $3, $5); }
           | TOK_IF '(' expr ')' statement TOK_ELSE statement
                                         { free_ast3($2, $4, $6);
