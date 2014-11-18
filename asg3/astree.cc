@@ -11,7 +11,8 @@
 #include "stringset.h"
 #include "lyutils.h"
 
-astree* new_astree(int symbol, int filenr, int linenr, int offset, const char* lexinfo) {
+astree* new_astree(int symbol, int filenr, int linenr, int offset,
+                   const char* lexinfo) {
     astree* tree = new astree();
     tree->symbol = symbol;
     tree->filenr = filenr;
@@ -56,14 +57,16 @@ astree* adopt2(astree* root, astree* left, astree* right) {
     return root;
 }
 
-astree* adopt3(astree* root, astree* left, astree* middle, astree* right) {
+astree* adopt3(astree* root, astree* left, astree* middle,
+               astree* right) {
     adopt1(root, left);
     adopt1(root, middle);
     adopt1(root, right);
     return root;
 }
 
-astree* adopt4(astree* root, astree* c1, astree* c2, astree* c3, astree* c4) {
+astree* adopt4(astree* root, astree* c1, astree* c2,
+               astree* c3, astree* c4) {
     adopt1(root, c1);
     adopt1(root, c2);
     adopt1(root, c3);
@@ -77,7 +80,8 @@ astree* adopt1sym(astree* root, astree* child, int symbol) {
     return root;
 }
 
-astree* adopt2sym(astree* root, astree* child1, astree* child2, int symbol) {
+astree* adopt2sym(astree* root, astree* child1, astree* child2,
+                  int symbol) {
     root = adopt1(root, child1);
     root = adopt1(root, child2);
     root->symbol = symbol;
