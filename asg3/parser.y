@@ -32,7 +32,7 @@ static void* yycalloc(size_t size);
 %token TOK_FUNCTION TOK_DECLID TOK_RETURNVOID TOK_NEWSTRING
 %token TOK_NEWARRAY TOK_CALL TOK_INDEX TOK_COMP TOK_BLOCK
 %token TOK_PARAM TOK_RECEXPR CALL TOK_PARAMLIST
-%token TOK_PROTOTYPE
+%token TOK_PROTOTYPE TOK_SEMICOLON
 
 %right TOK_IF TOK_ELSE
 %right '='
@@ -140,7 +140,7 @@ statement : block                       { $$ = $1; }
           | ifelse                      { $$ = $1; }
           | return                      { $$ = $1; }
           | expr ';'                    { free_ast($2);
-                                                $$ = $1; }
+                                          $$ = $1; }
           ;
 
 basetype  : TOK_VOID                    { $$ = $1; }
@@ -168,7 +168,9 @@ block     : '{' rec_statement '}'       { free_ast($3);
           | '{' '}'                     { $$ = new_custom_astree(
                                                TOK_BLOCK, "{", $1);
                                           free_ast2($1, $2); }
-          | ';'                         { free_ast($1); }
+          | ';'                         { new_custom_astree(
+                                                TOK_SEMICOLON, ";", $1);
+                                          free_ast($1); }
           ;
 
 vardecl   : rec_identdecl '=' expr ';'  { free_ast($4);
