@@ -248,7 +248,7 @@ allocator : TOK_NEW TOK_IDENT '(' ')'   { free_ast2($3, $4);
                                         { free_ast2($3, $5);
                                           $$ = adopt1sym($1, $4,
                                                 TOK_NEWSTRING); }
-          | TOK_NEW basetype '[' expr ' { free_ast2($3, $5);
+          | TOK_NEW basetype '[' expr ']' { free_ast2($3, $5);
                                           $$ = adopt2sym($1, $2, $4,
                                                 TOK_NEWARRAY); }
           ;
