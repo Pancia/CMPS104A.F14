@@ -168,7 +168,7 @@ block     : '{' rec_statement '}'       { free_ast($3);
           | '{' '}'                     { $$ = new_custom_astree(
                                                TOK_BLOCK, "{", $1);
                                           free_ast2($1, $2); }
-          | ';'                         { new_custom_astree(
+          | ';'                         { $$ = new_custom_astree(
                                                 TOK_SEMICOLON, ";", $1);
                                           free_ast($1); }
           ;
