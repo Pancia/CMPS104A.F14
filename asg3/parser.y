@@ -75,7 +75,7 @@ rec_fielddecl : rec_fielddecl fielddecl
                                         { $$ = adopt1(kidnap_children(
                                                 new_custom_astree(
                                                 TOK_STRUCT, "STRUCT",
-                                                $1, $1), $2); }
+                                                $1), $2); }
               | fielddecl               { $$ = $1; }
               ;
 
