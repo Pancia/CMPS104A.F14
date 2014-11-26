@@ -40,16 +40,20 @@ int scan_opts(int argc, char** argv) {
     return optind;
 }
 
-const string CPP = "/usr/bin/cpp";
-
-void scan(char* filename) {
+string make_filename(char* filename, string ending){
     string delimiter =".";
     size_t pos = 0;
     string str_fname = filename;
     pos = str_fname.find(delimiter);
     string fname = str_fname.substr(0, pos);
     DEBUGF('m', "filename=%s", filename);
-    tok_file.open(fname + ".tok", ios::out);
+    return (fname + ending);
+}
+
+const string CPP = "/usr/bin/cpp";
+
+void scan(char* filename) {
+    tok_file.open(make_filename(filename, ".tok"), ios::out);
     assert(tok_file.is_open());
     for(;;) {
         int token = yylex();
@@ -98,12 +102,7 @@ int main(int argc, char** argv) {
             scan(filename);
         }
         ofstream str_file;
-        string delimiter = ".";
-        size_t pos = 0;
-        string str_fname = filename;
-        pos = str_fname.find(delimiter);
-        string fname = str_fname.substr(0, pos);
-        str_file.open(fname + ".str", ios::out);
+        str_file.open(make_filename(filename, ".str"), ios::out);
         dump_stringset(str_file);
         str_file.close();
 
@@ -117,7 +116,7 @@ int main(int argc, char** argv) {
             DEBUGSTMT('a', dump_astree(stderr, yyparse_astree); );
             //emit_sm_code(yyparse_astree);
             ofstream ast_file;
-            ast_file.open(fname + ".ast", ios::out);
+            ast_file.open(make_filename(filename, ".ast"), ios::out);
             write_astree(ast_file, yyparse_astree);
         }
     }
