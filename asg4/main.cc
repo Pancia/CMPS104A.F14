@@ -110,7 +110,11 @@ void parse_node (ofstream& out, astree* node, int depth){
     s->fields = NULL;
     s->offset = node->offset;
 
-    symbol_stack[next_block-1]->insert (symbol_entry(node->lexinfo->c_str(), s));
+    char *q = new char[64];
+    strcpy(q, node->lexinfo->c_str());
+    string* str = &string(q);
+
+    symbol_stack[next_block-1]->insert (symbol_entry(str, s));
     node->node = symbol_stack[next_block-1];
 
     write_node(out, node, depth);
