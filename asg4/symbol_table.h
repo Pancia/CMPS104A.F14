@@ -27,5 +27,6 @@ struct symbol {
    vector<symbol*>* parameters;
 };
 
+vector<symbol_table*> symbol_stack;
 
 #endif

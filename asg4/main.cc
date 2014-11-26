@@ -86,17 +86,40 @@ void yyin_cpp_pclose(string filename) {
     if(pclose_rc != 0) set_exitstatus(EXIT_FAILURE);
 }
 
-void parse_node (ofstream& out, astree* node){
+void write_node (ofstream& out, astree* node, int depth){
     if (node == NULL) return;
-    out << get_yytname(node->symbol) << " "
+    out << std::string(depth * 3, ' ') << node->lexinfo->c_str() << " (" 
         << node->filenr << ":" << node->linenr << "." << node->offset
-        << node->attributes << node->block_number << node->node;
+        << ") {" << node->block_number << "} " << node->attributes << 
+        node->node << endl;
 }
 
-void parse_tree(ofstream& out, astree* root){
-    parse_node (out, root);
+void parse_node (ofstream& out, astree* node, int depth){
+    if (node == NULL) return;
+
+    int next_block = 1;
+    if (symbol_stack[next_block-1] == NULL) {
+        symbol_stack.push_back(new symbol_table());
+    }
+    symbol* s = new symbol();
+    s->filenr = node->filenr;
+    s->blocknr = next_block-1;
+    s->linenr = node->linenr;
+    s->attributes = NULL;
+    s->parameters = NULL;
+    s->fields = NULL;
+    s->offset = node->offset;
+
+    symbol_stack[next_block-1]->insert (symbol_entry(node->lexinfo->c_str(), s));
+    node->node = symbol_stack[next_block-1];
+
+    write_node(out, node, depth);
+}
+
+void parse_tree(ofstream& out, astree* root, int depth){
+    parse_node (out, root, depth);
     for(size_t child = 0; child < root->children.size(); ++child) {
-        parse_tree(out, root->children[child]);
+        parse_tree(out, root->children[child], depth+1);
     }
 }
 
@@ -138,7 +161,7 @@ int main(int argc, char** argv) {
         }
         ofstream sym_file;
         sym_file.open(make_filename(filename, ".sym"), ios::out);  
-        parse_tree(sym_file, yyparse_astree);
+        parse_tree(sym_file, yyparse_astree, 0);
         sym_file.close();
     }
     return get_exitstatus();
