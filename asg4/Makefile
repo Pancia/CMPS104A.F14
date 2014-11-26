@@ -7,8 +7,8 @@ VALGRIND  = valgrind --leak-check=full --show-reachable=yes
 #
 # Definitions of list of files:
 #
-HSOURCES  = astree.h  lyutils.h  auxlib.h  stringset.h
-CSOURCES  = astree.cc lyutils.cc auxlib.cc stringset.cc main.cc
+HSOURCES  = astree.h  lyutils.h  auxlib.h  stringset.h symbol_table.h
+CSOURCES  = astree.cc lyutils.cc auxlib.cc stringset.cc main.cc symbol_table.cc
 LSOURCES  = scanner.l
 YSOURCES  = parser.y
 ETCSRC    = README PARTNER ${MKFILE}
@@ -88,7 +88,8 @@ clean :
 	- rm ${foreach test, ${TESTINS:.in=}, \
 		${patsubst %, ${test}.%, out err}}
 spotless : clean
-	- rm ${EXECBIN} *.str *.tok *.ast y.* *.err *.out *.oc *.oh *.log *.lexyacctrace
+	- rm ${EXECBIN} *.str *.tok *.ast y.* *.err *.out 
+	- rm *.oc *.oh *.log *.lexyacctrace
 
 #
 # Build the dependencies file using the C preprocessor

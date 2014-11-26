@@ -9,6 +9,7 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "symbol_table.h"
 #include "auxlib.h"
 #include "lyutils.h"
 #include "stringset.h"
@@ -85,6 +86,20 @@ void yyin_cpp_pclose(string filename) {
     if(pclose_rc != 0) set_exitstatus(EXIT_FAILURE);
 }
 
+void parse_node (ofstream& out, astree* node){
+    if (node == NULL) return;
+    out << get_yytname(node->symbol) << " "
+        << node->filenr << ":" << node->linenr << "." << node->offset
+        << node->attributes << node->block_number << node->node;
+}
+
+void parse_tree(ofstream& out, astree* tree){
+    parse_node (out, tree);
+    for(size_t child = 0; child < root->children.size(); ++child) {
+        parse_tree(out, root->children[child]);
+    }
+}
+
 int main(int argc, char** argv) {
     set_execname(argv[0]);
     int parsecode = 0;
@@ -118,7 +133,12 @@ int main(int argc, char** argv) {
             ofstream ast_file;
             ast_file.open(make_filename(filename, ".ast"), ios::out);
             write_astree(ast_file, yyparse_astree);
+            ast_file.close();
         }
+        ofstream sym_file;
+        sym_file.open(make_filename(filename, ".sym"), ios::out);  
+	parse_tree(sym_file, yyparse_astree);
+        sym_file.close();
     }
     return get_exitstatus();
 }

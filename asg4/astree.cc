@@ -18,6 +18,9 @@ astree* new_astree(int symbol, int filenr, int linenr, int offset,
     tree->filenr = filenr;
     tree->linenr = linenr;
     tree->offset = offset;
+    tree->attributes = 0;
+    tree->block_number = 0;
+    tree->node = NULL;
     tree->lexinfo = intern_stringset(lexinfo);
     char symbol_name[64];
     memset(&symbol_name[0], 0, sizeof(symbol_name));
@@ -124,7 +127,8 @@ void dump_astree(FILE* outfile, astree* root) {
 
 static void write_node(ofstream& out, astree* node) {
     out << get_yytname(node->symbol) << " "
-        << node->filenr << ":" << node->linenr << "." << node->offset;
+        << node->filenr << ":" << node->linenr << "." << node->offset
+        << node->attributes << node->block_number << node->node;
     bool need_space = false;
     //wtf is this for?
     /*for(size_t child = 0; child < node->children.size(); ++child) {

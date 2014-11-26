@@ -6,6 +6,7 @@
 using namespace std;
 
 #include "auxlib.h"
+#include "symbol_table.h"
 
 struct astree {
    int symbol;               // token code
@@ -14,6 +15,9 @@ struct astree {
    size_t offset;            // offset of token with current line
    const string* lexinfo;    // pointer to lexical information
    vector<astree*> children; // children of this n-way node
+   attr_bitset attributes;
+   int block_number;
+   symbol_table* node;
 };
 
 astree* new_astree(int symbol, int filenr, int linenr, int offset,
