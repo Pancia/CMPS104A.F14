@@ -1,13 +1,10 @@
 #ifndef __SYMBOL_TABLE_H__
 #define __SYMBOL_TABLE_H__
 
-#include <iostream>
 #include <bitset>
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include "astree.h"
-
 using namespace std;
 
 enum { ATTR_void, ATTR_bool, ATTR_char, ATTR_int, ATTR_null,
@@ -16,9 +13,9 @@ enum { ATTR_void, ATTR_bool, ATTR_char, ATTR_int, ATTR_null,
        ATTR_lval, ATTR_const, ATTR_vreg, ATTR_vaddr,
        ATTR_bitset_size,
 };
+using attr_bitset = bitset<ATTR_bitset_size>;
 
 struct symbol;
-using attr_bitset = bitset<ATTR_bitset_size>;
 using symbol_table = unordered_map<string*,symbol*>;
 using symbol_entry = pair<string*,symbol*>;
 
@@ -29,5 +26,6 @@ struct symbol {
    size_t blocknr;
    vector<symbol*>* parameters;
 };
+
 
 #endif

@@ -7,7 +7,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "astree.h"
 #include "stringset.h"
 #include "lyutils.h"
 
@@ -127,8 +126,7 @@ void dump_astree(FILE* outfile, astree* root) {
 
 static void write_node(ofstream& out, astree* node) {
     out << get_yytname(node->symbol) << " "
-        << node->filenr << ":" << node->linenr << "." << node->offset
-        << node->attributes << node->block_number << node->node;
+        << node->filenr << ":" << node->linenr << "." << node->offset;
     bool need_space = false;
     //wtf is this for?
     /*for(size_t child = 0; child < node->children.size(); ++child) {

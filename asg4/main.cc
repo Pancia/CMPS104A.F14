@@ -93,12 +93,13 @@ void parse_node (ofstream& out, astree* node){
         << node->attributes << node->block_number << node->node;
 }
 
-void parse_tree(ofstream& out, astree* tree){
-    parse_node (out, tree);
+void parse_tree(ofstream& out, astree* root){
+    parse_node (out, root);
     for(size_t child = 0; child < root->children.size(); ++child) {
         parse_tree(out, root->children[child]);
     }
 }
+
 
 int main(int argc, char** argv) {
     set_execname(argv[0]);
@@ -137,7 +138,7 @@ int main(int argc, char** argv) {
         }
         ofstream sym_file;
         sym_file.open(make_filename(filename, ".sym"), ios::out);  
-	parse_tree(sym_file, yyparse_astree);
+        parse_tree(sym_file, yyparse_astree);
         sym_file.close();
     }
     return get_exitstatus();
