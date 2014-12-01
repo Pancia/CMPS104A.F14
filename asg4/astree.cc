@@ -136,7 +136,7 @@ static void write_node(ofstream& out, astree* node) {
     const auto& auto_node = node->node->find(node->lexinfo);
     assert(auto_node != node->node->end());
 
-    out << "(" << auto_node->second->filenr << ":"
+    out << " (" << auto_node->second->filenr << ":"
                << auto_node->second->linenr << "."
                << auto_node->second->offset << ") ";
     out << endl;
