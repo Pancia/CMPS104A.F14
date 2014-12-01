@@ -115,16 +115,17 @@ int main(int argc, char** argv) {
         } else {
             DEBUGSTMT('a', dump_astree(stderr, yyparse_astree); );
             //emit_sm_code(yyparse_astree);
-            ofstream ast_file;
-            ast_file.open(make_filename(filename, ".ast"), ios::out);
-            write_astree(ast_file, yyparse_astree);
-            ast_file.close();
         }
 
         ofstream sym_file;
         sym_file.open(make_filename(filename, ".sym"), ios::out);
         parse_tree(sym_file, yyparse_astree, 0);
         sym_file.close();
+
+        ofstream ast_file;
+        ast_file.open(make_filename(filename, ".ast"), ios::out);
+        write_astree(ast_file, yyparse_astree);
+        ast_file.close();
     }
     return get_exitstatus();
 }

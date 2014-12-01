@@ -163,6 +163,7 @@ void parse_node (ofstream& out, astree* node, int depth){
     symbol_stack[blocknr]->insert(symbol_entry(node->lexinfo, s));
     node->node = symbol_stack[blocknr];
     node->block_number = s->blocknr;
+    node->attributes = s->attributes;
 
     write_node(out, node, depth);
 }
@@ -170,7 +171,7 @@ void parse_node (ofstream& out, astree* node, int depth){
 void parse_tree(ofstream& out, astree* node, int depth){
     //parse_node might need to be done after the for loop
     //so as to do a DFS, not a BFS...
-    parse_node (out, node, depth);
+    parse_node(out, node, depth);
     if (node->symbol == TOK_BLOCK) {
         blocknr++;
         out << "BLOCK++ " << blocknr << endl;
