@@ -137,7 +137,7 @@ static void write_node(ofstream& out, astree* node) {
 
 static void write_astree_rec(ofstream& out, astree* root, int depth) {
     if(root == NULL) return;
-    out << std::string(depth * 3, ' ')
+    out << std::string(depth * 3, ' ');
     write_node(out, root);
     for(size_t child = 0; child < root->children.size(); ++child) {
         write_astree_rec(out, root->children[child], depth + 1);
