@@ -70,7 +70,7 @@ void write_symbol(ofstream& out, symbol_table* sym_table, const string* s) {
         << ":off " << node->second->offset  << ", "
         << ":bnr " << node->second->blocknr << ", "
         << ":atr ";
-    write_attributes(out, node->second->attributes, nullptr);
+    write_attributes(out, node->second->attributes, "");
     out << "}";
 }
 
