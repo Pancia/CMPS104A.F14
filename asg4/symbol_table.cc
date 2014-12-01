@@ -36,7 +36,7 @@ void write_attributes(ofstream& out, attr_bitset attr, string asdf) {
         out << "variable ";
     }
     if (attr[ATTR_field] == 1 && !asdf.empty()) {
-        out << "field {" << asdf << "}";
+        out << "field {" << asdf << "} ";
     } else if (attr[ATTR_field] == 1) {
         out << "ffield ";
     }
@@ -171,7 +171,7 @@ void parse_node (ofstream& out, astree* node, int depth){
     write_node(out, node, depth);
 }
 
-void parse_struct(ofstream& out, astree* node, int depth, const string* name,
+void parse_struct(astree* node, int depth, const string* name,
                   symbol_table* fields) {
     if (node == nullptr) return;
 
@@ -188,8 +188,8 @@ void write_struct_field(ofstream& out, astree* node, int depth, string name) {
         << node->filenr << ":"
         << node->linenr << "."
         << node->offset
-        << ")"
-    write_attributes(out, node->attributes, node->lexinfo);
+        << ") field {" << name << "} " ;
+    write_attributes(out, node->attributes, name);
     out << endl;
 }
 
@@ -205,7 +205,8 @@ void write_struct(ofstream& out, astree* node, int depth) {
     out << endl;
 
     for(size_t child = 1; child < node->children.size(); ++child) {
-        write_struct_field(out, node->children[child], depth+1, struct_name);
+        write_struct_field(out, node->children[child], depth+1,
+                           node->children[0]->lexinfo);
     }
 }
 
@@ -223,7 +224,7 @@ void parse_tree(ofstream& out, astree* node, int depth) {
         node->block_number = 0;
         node->attributes.set(ATTR_struct);
         for(size_t child = 1; child < node->children.size(); ++child) {
-            parse_struct(out, node->children[child], depth+1, struct_name,
+            parse_struct(node->children[child], depth+1, struct_name,
                          node->children[0]->fields);
         }
         symbol* s = new_symbol(node, 0);
