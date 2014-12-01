@@ -35,7 +35,7 @@ void write_attributes(ofstream& out, attr_bitset attr, const string* asdf) {
     if (attr[ATTR_variable] == 1) {
         out << "variable ";
     }
-    if (attr[ATTR_field] == 1 && !asdf.empty()) {
+    if (attr[ATTR_field] == 1 && !asdf->empty()) {
         out << "field {" << asdf << "} ";
     } else if (attr[ATTR_field] == 1) {
         out << "ffield ";
@@ -70,7 +70,7 @@ void write_symbol(ofstream& out, symbol_table* sym_table, const string* s) {
         << ":off " << node->second->offset  << ", "
         << ":bnr " << node->second->blocknr << ", "
         << ":atr ";
-    write_attributes(out, node->second->attributes, "");
+    write_attributes(out, node->second->attributes, nullptr);
     out << "}";
 }
 
