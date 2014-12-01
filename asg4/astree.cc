@@ -125,9 +125,8 @@ void dump_astree(FILE* outfile, astree* root) {
 }
 
 static void write_node(ofstream& out, astree* node) {
-    out << std::string(depth * 3, ' ')
-        << get_yytname(node->symbol) << " "
-        << root->lexinfo->c_str() << " ";
+    out << get_yytname(node->symbol) << " "
+        << node->lexinfo->c_str() << " "
         << "(" << node->filenr << ":"
                << node->linenr << "."
                << node->offset << ") "
@@ -138,6 +137,7 @@ static void write_node(ofstream& out, astree* node) {
 
 static void write_astree_rec(ofstream& out, astree* root, int depth) {
     if(root == NULL) return;
+    out << std::string(depth * 3, ' ')
     write_node(out, root);
     for(size_t child = 0; child < root->children.size(); ++child) {
         write_astree_rec(out, root->children[child], depth + 1);
