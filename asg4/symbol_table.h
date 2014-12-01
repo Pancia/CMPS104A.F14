@@ -32,6 +32,6 @@ struct symbol {
 #include "lyutils.h"
 
 void parse_tree(ofstream& out, astree* node, int depth);
-void write_attributes(ofstream& out, attr_bitset attr);
+void write_attributes(ofstream& out, attr_bitset attr, string asdf);
 
 #endif

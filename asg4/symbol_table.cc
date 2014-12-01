@@ -220,16 +220,21 @@ void parse_tree(ofstream& out, astree* node, int depth) {
     }
     if (in_struct) {
         const string* struct_name = node->children[0]->lexinfo;
-        node->children[0]->node->fields = new symbol_table();
+        const auto& auto_node = struct_stack->find(struct_name);
+        symbol* sym;
+        if (auto_node != struct_stack->end()) {
+            sym = auto_node->second;
+        } else {
+            sym = new_symbol(node, 0);
+            sym->fields = new symbol_table();
+        }
         node->block_number = 0;
         node->attributes.set(ATTR_struct);
         for(size_t child = 1; child < node->children.size(); ++child) {
             parse_struct(node->children[child], depth+1, struct_name,
-                         node->children[0]->node->fields);
+                         sym->fields);
         }
-        symbol* s = new_symbol(node, 0);
-        s->fields = node->children[0]->node->fields;
-        struct_stack->insert(symbol_entry(struct_name, s));
+        struct_stack->insert(symbol_entry(struct_name, sym));
     } else {
         for(size_t child = 0; child < node->children.size(); ++child) {
             parse_tree(out, node->children[child], depth+1);

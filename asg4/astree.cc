@@ -131,8 +131,6 @@ static void write_node(ofstream& out, astree* node) {
                << node->linenr << "."
                << node->offset << ") "
         << "{" << node->block_number << "} ";
-    write_attributes(out, node->attributes);
-
     const auto& auto_node = node->node->find(node->lexinfo);
     assert(auto_node != node->node->end());
 
