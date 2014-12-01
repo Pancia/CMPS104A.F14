@@ -29,6 +29,8 @@ struct symbol {
    vector<symbol*>* parameters;
 };
 
+#include "astree.h"
+
 void parse_tree(ofstream& out, astree* node, int depth);
 
 #endif
