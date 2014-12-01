@@ -36,7 +36,7 @@ void write_attributes(ofstream& out, attr_bitset attr, const string* asdf) {
         out << "variable ";
     }
     if (attr[ATTR_field] == 1 && !asdf->empty()) {
-        out << "field {" << asdf << "} ";
+        out << "field {" << *asdf << "} ";
     } else if (attr[ATTR_field] == 1) {
         out << "ffield ";
     }
@@ -173,13 +173,14 @@ void parse_struct(astree* node, const string* name, symbol_table* fields) {
     if (node == nullptr) return;
 
     symbol* s = new_symbol(node, 0);
+    s->attributes.set(ATTR_field);
 
     fields->insert(symbol_entry(name, s));
     node->node = fields;
     node->attributes = s->attributes;
 }
 
-void write_struct_field(ofstream& out, astree* node, int depth, const string* name) {
+void write_struct_field(ofstream& out, astree* node, int depth, string name) {
     out << std::string(depth * 3, ' ') << node->lexinfo
         << " ("
         << node->filenr << ":"
