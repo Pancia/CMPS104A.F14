@@ -3,7 +3,7 @@
 
 using namespace std;
 
-void write_attributes(ofstream& out, attr_bitset attr, const string asdf) {
+void write_attributes(ofstream& out, attr_bitset attr, const string* asdf) {
     out << "attr@{";
     if (attr[ATTR_void] == 1) {
         out << "void ";
