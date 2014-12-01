@@ -1,10 +1,14 @@
 #ifndef __SYMBOL_TABLE_H__
 #define __SYMBOL_TABLE_H__
 
+#include <iostream>
 #include <bitset>
 #include <string>
 #include <unordered_map>
 #include <vector>
+
+#include "lyutils.h"
+
 using namespace std;
 
 enum { ATTR_void, ATTR_bool, ATTR_char, ATTR_int, ATTR_null,
