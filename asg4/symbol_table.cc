@@ -180,7 +180,7 @@ void parse_struct(astree* node, const string* name, symbol_table* fields) {
     node->attributes = s->attributes;
 }
 
-void write_struct_field(ofstream& out, astree* node, int depth, string name) {
+void write_struct_field(ofstream& out, astree* node, int depth, const string* name) {
     out << std::string(depth * 3, ' ') << node->lexinfo
         << " ("
         << node->filenr << ":"
