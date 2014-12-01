@@ -132,9 +132,13 @@ static void write_node(ofstream& out, astree* node) {
                << node->offset << ") "
         << "{" << node->block_number << "} ";
     write_attributes(out, node->attributes);
-    out << "(" << node->node->filenr << ":"
-               << node->node->linenr << "."
-               << node->node->offset << ") "
+
+    const auto& auto_node = sym_table->find(s);
+    assert(auto_node != sym_table->end());
+
+    out << "(" << auto_node->second->filenr << ":"
+               << auto_node->second->linenr << "."
+               << auto_node->second->offset << ") ";
     out << endl;
 }
 
