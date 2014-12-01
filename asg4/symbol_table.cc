@@ -150,7 +150,7 @@ symbol* new_symbol(astree* node, int blocknr) {
     return s;
 }
 
-void parse_node (ofstream& out, astree* node, int depth){
+void parse_node (astree* node, int depth){
     if (node == nullptr) return;
 
     if (symbol_stack[blocknr] == nullptr) {
@@ -167,8 +167,6 @@ void parse_node (ofstream& out, astree* node, int depth){
     node->node = symbol_stack[blocknr];
     node->block_number = s->blocknr;
     node->attributes = s->attributes;
-
-    write_node(out, node, depth);
 }
 
 void parse_struct(astree* node, const string* name, symbol_table* fields) {
@@ -193,7 +191,7 @@ void write_struct_field(ofstream& out, astree* node, int depth, const string* na
 }
 
 void write_struct(ofstream& out, astree* node, int depth) {
-    out << std::string(depth * 3, ' ') << node->children[0]->lexinfo
+    out << std::string(depth * 3, ' ') << *node->children[0]->lexinfo
         << " ("
         << node->children[0]->filenr << ":"
         << node->children[0]->linenr << "."
@@ -209,10 +207,9 @@ void write_struct(ofstream& out, astree* node, int depth) {
     }
 }
 
-void parse_tree(ofstream& out, astree* node, int depth) {
+void parse_tree(astree* node, int depth) {
     switch (node->symbol) {
         case TOK_BLOCK:     blocknr++;
-                            out << "BLOCK++ " << blocknr << endl;
                             break;
         case TOK_STRUCT:    in_struct = true;
                             break;
@@ -235,16 +232,25 @@ void parse_tree(ofstream& out, astree* node, int depth) {
         struct_stack->insert(symbol_entry(struct_name, sym));
     } else {
         for(size_t child = 0; child < node->children.size(); ++child) {
-            parse_tree(out, node->children[child], depth+1);
+            parse_tree(node->children[child], depth+1);
         }
     }
     switch (node->symbol) {
         case TOK_STRUCT:    in_struct = false;
-                            write_struct(out, node, depth);
                             break;
         case TOK_BLOCK:     blocknr--;
-                            out << "BLOCK-- " << blocknr << endl;
-        default:            parse_node(out, node, depth);
+        default:            parse_node(node, depth);
                             break;
+    }
+}
+
+void write_tree(ofstream& out, astree* node, int depth) {
+    if (node->symbol == TOK_STRUCT) {
+        write_struct(out, node, depth);
+    } else {
+        write_node(out, node, depth);
+        for(size_t child = 0; child < node->children.size(); ++child) {
+            write_tree(out, node->children[child], depth+1);
+        }
     }
 }
