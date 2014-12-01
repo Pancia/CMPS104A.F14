@@ -199,7 +199,7 @@ void write_struct(ofstream& out, astree* node, int depth) {
         << node->children[0]->offset
         << ")"
         << " {" << node->children[0]->block_number << "} ";
-    out << "struct \"" << node->children[0]->lexinfo << "\"";
+    out << "struct \"" << node->children[0]->lexinfo->c_str() << "\"";
     out << endl;
 
     for(size_t child = 1; child < node->children.size(); ++child) {
