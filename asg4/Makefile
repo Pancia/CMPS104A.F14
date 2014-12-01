@@ -88,8 +88,8 @@ clean :
 	- rm ${foreach test, ${TESTINS:.in=}, \
 		${patsubst %, ${test}.%, out err}}
 spotless : clean
-	- rm ${EXECBIN} *.str *.tok *.ast y.* *.err *.out 
-	- rm *.oc *.oh *.log *.lexyacctrace
+	- rm ${EXECBIN} *.str *.tok *.ast y.* *.err *.out
+	- rm *.oc *.oh *.log *.lexyacctrace *.sym
 
 #
 # Build the dependencies file using the C preprocessor
