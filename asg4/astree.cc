@@ -132,6 +132,9 @@ static void write_node(ofstream& out, astree* node) {
                << node->offset << ") "
         << "{" << node->block_number << "} ";
     write_attributes(out, node->attributes);
+    out << "(" << node->node->filenr << ":"
+               << node->node->linenr << "."
+               << node->node->offset << ") "
     out << endl;
 }
 
