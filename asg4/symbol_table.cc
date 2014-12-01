@@ -1,4 +1,5 @@
 #include "symbol_table.h"
+#include <assert.h>
 
 using namespace std;
 
