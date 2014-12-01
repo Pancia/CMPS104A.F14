@@ -146,10 +146,10 @@ void write_symbol(ofstream& out, symbol_table* sym_table, const string* s) {
     const auto& node = sym_table->find(s);
     assert(node != sym_table->end());
     out << "sym@{"
-        << ":fnr " << node->second->filenr << ", "
-        << ":lnr " << node->second->linenr << ", "
-        << ":off " << node->second->offset << ", "
-        << ":bnr" << node->second->blocknr << ", "
+        << ":fnr " << node->second->filenr  << ", "
+        << ":lnr " << node->second->linenr  << ", "
+        << ":off " << node->second->offset  << ", "
+        << ":bnr " << node->second->blocknr << ", "
         << ":atr ";
     write_attributes(out, node->second->attributes);
     out << "}";
@@ -157,9 +157,13 @@ void write_symbol(ofstream& out, symbol_table* sym_table, const string* s) {
 
 void write_node (ofstream& out, astree* node, int depth){
     if (node == nullptr) return;
-    out << std::string(depth * 3, ' ') << node->lexinfo->c_str() << " ("
-        << node->filenr << ":" << node->linenr << "." << node->offset
-        << ") {" << node->block_number << "} ";
+    out << std::string(depth * 3, ' ') << node->lexinfo->c_str()
+        << " ("
+        << node->filenr << ":"
+        << node->linenr << "."
+        << node->offset
+        << ")"
+        << " {" << node->block_number << "} ";
     write_symbol(out, node->node, node->lexinfo);
     out << endl;
 }
@@ -206,13 +210,17 @@ attr_bitset get_node_attr(astree* node) {
 }
 
 vector<symbol_table*> symbol_stack(16, nullptr);
-int this_block = 0;
+symbol_table* struct_stack = new symbol_table();
 
-symbol* new_symbol(astree* node) {
+int blocknr = 0;
+
+symbol* new_symbol(astree* node, int blocknr) {
     symbol* s = new symbol();
 
+    //filenr/linenr/offset point to first instance
+    //of the thing node represents...
     s->filenr = node->filenr;
-    s->blocknr = this_block;
+    s->blocknr = blocknr;
     s->linenr = node->linenr;
     s->attributes = get_node_attr(node);
     s->parameters = nullptr;
@@ -225,36 +233,38 @@ symbol* new_symbol(astree* node) {
 void parse_node (ofstream& out, astree* node, int depth){
     if (node == nullptr) return;
 
-    if (symbol_stack[this_block] == nullptr) {
-        vector<symbol_table*>::iterator it = symbol_stack.begin() + this_block;
+    if (symbol_stack[blocknr] == nullptr) {
+        vector<symbol_table*>::iterator it = symbol_stack.begin() + blocknr;
         symbol_stack.insert(it, new symbol_table());
     }
 
     //if (node->symbol == TOK_BLOCK)
     //    return;
 
-    symbol* s = new_symbol(node);
+    symbol* s = new_symbol(node, blocknr);
 
-    symbol_stack[this_block]->insert(symbol_entry(node->lexinfo, s));
-    node->node = symbol_stack[this_block];
+    symbol_stack[blocknr]->insert(symbol_entry(node->lexinfo, s));
+    node->node = symbol_stack[blocknr];
     node->block_number = s->blocknr;
 
     write_node(out, node, depth);
 }
 
 void parse_tree(ofstream& out, astree* node, int depth){
+    //parse_node might need to be done after the for loop
+    //so as to do a DFS, not a BFS...
     parse_node (out, node, depth);
     if (node->symbol == TOK_BLOCK) {
-        this_block++;
-        out << "BLOCK++ " << this_block << endl;
+        blocknr++;
+        out << "BLOCK++ " << blocknr << endl;
     }
     for(size_t child = 0; child < node->children.size(); ++child) {
         parse_tree(out, node->children[child], depth+1);
     }
     if (node->symbol == TOK_BLOCK) {
-        //symbol_stack[this_block] = nullptr;
-        this_block--;
-        out << "BLOCK--" << this_block << endl;
+        //symbol_stack[blocknr] = nullptr;
+        blocknr--;
+        out << "BLOCK--" << blocknr << endl;
     }
 }
 
@@ -282,7 +292,6 @@ int main(int argc, char** argv) {
         yyin_cpp_popen(filename);
         parsecode = yyparse();
         yyin_cpp_pclose(filename);
-
         if(parsecode) {
             errprintf("%:parse failed(%d)\n", parsecode);
         } else {
@@ -293,6 +302,7 @@ int main(int argc, char** argv) {
             write_astree(ast_file, yyparse_astree);
             ast_file.close();
         }
+
         ofstream sym_file;
         sym_file.open(make_filename(filename, ".sym"), ios::out);
         parse_tree(sym_file, yyparse_astree, 0);
