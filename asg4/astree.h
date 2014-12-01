@@ -5,6 +5,8 @@
 #include <vector>
 
 #include "auxlib.h"
+
+struct astree;
 #include "symbol_table.h"
 
 using namespace std;
