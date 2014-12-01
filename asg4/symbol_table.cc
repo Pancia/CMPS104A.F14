@@ -3,7 +3,7 @@
 
 using namespace std;
 
-void write_attributes(ofstream& out, attr_bitset attr, string asdf) {
+void write_attributes(ofstream& out, attr_bitset attr, const string asdf) {
     out << "attr@{";
     if (attr[ATTR_void] == 1) {
         out << "void ";
@@ -171,8 +171,7 @@ void parse_node (ofstream& out, astree* node, int depth){
     write_node(out, node, depth);
 }
 
-void parse_struct(astree* node, const string* name,
-                  symbol_table* fields) {
+void parse_struct(astree* node, const string* name, symbol_table* fields) {
     if (node == nullptr) return;
 
     symbol* s = new_symbol(node, 0);
@@ -231,8 +230,7 @@ void parse_tree(ofstream& out, astree* node, int depth) {
         node->block_number = 0;
         node->attributes.set(ATTR_struct);
         for(size_t child = 1; child < node->children.size(); ++child) {
-            parse_struct(node->children[child], depth+1, struct_name,
-                         sym->fields);
+            parse_struct(node->children[child], struct_name, sym->fields);
         }
         struct_stack->insert(symbol_entry(struct_name, sym));
     } else {
