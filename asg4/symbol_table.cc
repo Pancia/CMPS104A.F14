@@ -35,7 +35,7 @@ void write_attributes(ofstream& out, attr_bitset attr, string asdf) {
     if (attr[ATTR_variable] == 1) {
         out << "variable ";
     }
-    if (attr[ATTR_field] == 1 && asdf != nullptr) {
+    if (attr[ATTR_field] == 1 && !asdf.empty()) {
         out << "field {" << asdf << "}";
     } else if (attr[ATTR_field] == 1) {
         out << "ffield ";
@@ -171,7 +171,7 @@ void parse_node (ofstream& out, astree* node, int depth){
     write_node(out, node, depth);
 }
 
-void parse_struct(ofstream& out, astree* node, int depth, const string name,
+void parse_struct(ofstream& out, astree* node, int depth, const string* name,
                   symbol_table* fields) {
     if (node == nullptr) return;
 
@@ -218,7 +218,7 @@ void parse_tree(ofstream& out, astree* node, int depth) {
                             break;
     }
     if (in_struct) {
-        const string struct_name = node->children[0]->lexinfo;
+        const string* struct_name = node->children[0]->lexinfo;
         node->children[0]->fields = new symbol_table();
         node->block_number = 0;
         node->attributes.set(ATTR_struct);
