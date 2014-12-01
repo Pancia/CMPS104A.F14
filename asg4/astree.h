@@ -3,10 +3,11 @@
 
 #include <string>
 #include <vector>
-using namespace std;
 
 #include "auxlib.h"
 #include "symbol_table.h"
+
+using namespace std;
 
 struct astree {
    int symbol;               // token code

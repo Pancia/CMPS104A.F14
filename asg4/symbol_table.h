@@ -7,8 +7,6 @@
 #include <unordered_map>
 #include <vector>
 
-#include "lyutils.h"
-
 using namespace std;
 
 enum { ATTR_void, ATTR_bool, ATTR_char, ATTR_int, ATTR_null,
@@ -30,5 +28,7 @@ struct symbol {
    size_t blocknr;
    vector<symbol*>* parameters;
 };
+
+void parse_tree(ofstream& out, astree* node, int depth);
 
 #endif
