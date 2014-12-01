@@ -4,7 +4,11 @@
 using namespace std;
 
 void write_attributes(ofstream& out, attr_bitset attr, const string* asdf) {
-    out << "attr@{";
+    if (attr[ATTR_field] == 1 && !asdf->empty()) {
+        out << "field {" << *asdf << "} ";
+    } else if (attr[ATTR_field] == 1) {
+        out << "ffield ";
+    }
     if (attr[ATTR_void] == 1) {
         out << "void ";
     }
@@ -35,11 +39,6 @@ void write_attributes(ofstream& out, attr_bitset attr, const string* asdf) {
     if (attr[ATTR_variable] == 1) {
         out << "variable ";
     }
-    if (attr[ATTR_field] == 1 && !asdf->empty()) {
-        out << "field {" << *asdf << "} ";
-    } else if (attr[ATTR_field] == 1) {
-        out << "ffield ";
-    }
     if (attr[ATTR_typeid] == 1) {
         out << "typeid ";
     }
@@ -58,7 +57,6 @@ void write_attributes(ofstream& out, attr_bitset attr, const string* asdf) {
     if (attr[ATTR_vaddr] == 1) {
         out << "vaddr ";
     }
-    out << "}";
 }
 
 void write_symbol(ofstream& out, symbol_table* sym_table, const string* s) {
