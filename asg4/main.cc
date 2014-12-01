@@ -119,7 +119,8 @@ int main(int argc, char** argv) {
 
         ofstream sym_file;
         sym_file.open(make_filename(filename, ".sym"), ios::out);
-        parse_tree(sym_file, yyparse_astree, 0);
+        parse_tree(yyparse_astree, 0);
+        write_tree(out, yyparse_astree, 0);
         sym_file.close();
 
         ofstream ast_file;

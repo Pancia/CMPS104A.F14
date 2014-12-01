@@ -150,7 +150,7 @@ symbol* new_symbol(astree* node, int blocknr) {
     return s;
 }
 
-void parse_node (astree* node, int depth){
+void parse_node (astree* node){
     if (node == nullptr) return;
 
     if (symbol_stack[blocknr] == nullptr) {
@@ -207,7 +207,7 @@ void write_struct(ofstream& out, astree* node, int depth) {
     }
 }
 
-void parse_tree(astree* node, int depth) {
+void parse_tree(astree* node) {
     switch (node->symbol) {
         case TOK_BLOCK:     blocknr++;
                             break;
@@ -232,14 +232,14 @@ void parse_tree(astree* node, int depth) {
         struct_stack->insert(symbol_entry(struct_name, sym));
     } else {
         for(size_t child = 0; child < node->children.size(); ++child) {
-            parse_tree(node->children[child], depth+1);
+            parse_tree(node->children[child]);
         }
     }
     switch (node->symbol) {
         case TOK_STRUCT:    in_struct = false;
                             break;
         case TOK_BLOCK:     blocknr--;
-        default:            parse_node(node, depth);
+        default:            parse_node(node);
                             break;
     }
 }
