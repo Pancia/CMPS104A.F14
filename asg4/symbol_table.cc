@@ -64,14 +64,11 @@ void write_symbol(ofstream& out, symbol_table* sym_table,
                   const string* s) {
     const auto& node = sym_table->find(s);
     assert(node != sym_table->end());
-    out << "sym@{"
-        << ":fnr " << node->second->filenr  << ", "
-        << ":lnr " << node->second->linenr  << ", "
-        << ":off " << node->second->offset  << ", "
-        << ":bnr " << node->second->blocknr << ", "
-        << ":atr ";
+    out << "(" << node->second->filenr  << "."
+        << node->second->linenr  << "."
+        << node->second->offset  << ") {"
+        << node->second->blocknr << "}";
     write_attributes(out, node->second->attributes, nullptr);
-    out << "}";
 }
 
 void write_node(ofstream& out, astree* node, int depth){
@@ -83,7 +80,7 @@ void write_node(ofstream& out, astree* node, int depth){
         << node->linenr << "."
         << node->offset
         << ")"
-        << " {" << node->block_number << "} ";
+        << " {" << node->block_number << "}  ";
     write_symbol(out, node->node, node->lexinfo);
     out << endl;
 }
@@ -175,9 +172,6 @@ attr_bitset set_node_attr(astree* node) {
         case TOK_TRUE:
         case TOK_FALSE:     attr.set(ATTR_bool);
                             attr.set(ATTR_const);
-                            break;
-        default:
-                            attr.set(ATTR_null);
                             break;
     }
     return attr;
