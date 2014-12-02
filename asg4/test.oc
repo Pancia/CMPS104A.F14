@@ -1,0 +1,29 @@
+void spam (int x) {
+    if (5 / 2 + !1 > 2) {
+        int x = baz[2];
+    } else {
+/*        y.foo = fac(5);*/
+        int z = new foo();
+        return true;
+    }
+}
+ 
+int qcx = 5;
+ 
+int fac (int n, int o, int q) {
+    int f = 1;
+        while (n > 1) {
+            f = f * n;
+                n = n - 1;
+        }
+    return f;
+}
+ 
+int n = 1;
+ 
+while (n <= 5) {
+/*  puti(fac (n));*/
+}
+ 
+struct data { int i; char c; }
+
