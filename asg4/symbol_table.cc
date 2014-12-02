@@ -3,7 +3,8 @@
 
 using namespace std;
 
-void write_attributes(ofstream& out, attr_bitset attr, const string* asdf) {
+void write_attributes(ofstream& out, attr_bitset attr,
+                      const string* asdf) {
     if (attr[ATTR_field] == 1 && !asdf->empty()) {
         out << "field {" << *asdf << "} ";
     } else if (attr[ATTR_field] == 1) {
@@ -59,7 +60,8 @@ void write_attributes(ofstream& out, attr_bitset attr, const string* asdf) {
     }
 }
 
-void write_symbol(ofstream& out, symbol_table* sym_table, const string* s) {
+void write_symbol(ofstream& out, symbol_table* sym_table,
+                  const string* s) {
     const auto& node = sym_table->find(s);
     assert(node != sym_table->end());
     out << "sym@{"
@@ -86,8 +88,10 @@ void write_node(ofstream& out, astree* node, int depth){
     out << endl;
 }
 
-void write_struct_field(ofstream& out, astree* node, int depth, const string* name) {
-    out << std::string(depth * 3, ' ') << node->children[0]->lexinfo->c_str()
+void write_struct_field(ofstream& out, astree* node, int depth,
+                        const string* name) {
+    out << std::string(depth * 3, ' ')
+        << node->children[0]->lexinfo->c_str()
         << " ("
         << node->filenr << ":"
         << node->linenr << "."
@@ -207,7 +211,8 @@ void parse_node (astree* node){
     if (node == nullptr) return;
 
     if (symbol_stack[blocknr] == nullptr) {
-        vector<symbol_table*>::iterator it = symbol_stack.begin() + blocknr;
+        vector<symbol_table*>::iterator it;
+        it = symbol_stack.begin() + blocknr;
         symbol_stack.insert(it, new symbol_table());
     }
 
@@ -222,7 +227,8 @@ void parse_node (astree* node){
     node->attributes = s->attributes;
 }
 
-void _write_symbol(ostream& out, symbol_table* sym_table, const string* s) {
+void _write_symbol(ostream& out, symbol_table* sym_table,
+                   const string* s) {
     const auto& node = sym_table->find(s);
     assert(node != sym_table->end());
     out << "fields" << "@" << *s <<"{"
@@ -234,7 +240,8 @@ void _write_symbol(ostream& out, symbol_table* sym_table, const string* s) {
     out << "}" << endl;
 }
 
-void parse_struct_child(astree* node, const string* name, symbol_table* fields) {
+void parse_struct_child(astree* node, const string* name,
+                        symbol_table* fields) {
     if (node == nullptr) return;
 
     symbol* s = new_symbol(node, 0);
@@ -267,7 +274,8 @@ void parse_struct(astree* node) {
     node->attributes.set(ATTR_struct);
     node->node = struct_stack;
     for(size_t child = 1; child < node->children.size(); ++child) {
-        parse_struct_child(node->children[child], struct_name, sym->fields);
+        parse_struct_child(node->children[child], struct_name,
+                           sym->fields);
     }
     struct_stack->insert(symbol_entry(struct_name, sym));
 }

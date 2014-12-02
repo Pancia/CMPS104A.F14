@@ -49,7 +49,8 @@ program   : rec_start                   { yyparse_astree = $1; }
 
 rec_start : rec_start start             { $$ = adopt1(
                                                 kidnap_children(
-                                                new_custom_astree(TOK_ROOT,
+                                                new_custom_astree(
+                                                    TOK_ROOT,
                                                     "<<ROOT>>", $1), $1)
                                                 , $2); }
           | start                       { $$ = $1; }
