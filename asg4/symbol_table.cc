@@ -5,7 +5,7 @@ using namespace std;
 
 void write_attributes(ofstream& out, attr_bitset attr,
                       const string* asdf) {
-    if (attr[ATTR_field] == 1 && !asdf->empty()) {
+    if (attr[ATTR_field] == 1 && asdf != nullptr && !asdf->empty()) {
         out << "field {" << *asdf << "} ";
     } else if (attr[ATTR_field] == 1) {
         out << "ffield ";
@@ -67,7 +67,7 @@ void write_symbol(ofstream& out, symbol_table* sym_table,
     out << "(" << node->second->filenr  << "."
         << node->second->linenr  << "."
         << node->second->offset  << ") {"
-        << node->second->blocknr << "}";
+        << node->second->blocknr << "} ";
     write_attributes(out, node->second->attributes, nullptr);
 }
 
@@ -80,7 +80,7 @@ void write_node(ofstream& out, astree* node, int depth){
         << node->linenr << "."
         << node->offset
         << ")"
-        << " {" << node->block_number << "}  ";
+        << " {" << node->block_number << "} ";
     write_symbol(out, node->node, node->lexinfo);
     out << endl;
 }

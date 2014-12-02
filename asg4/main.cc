@@ -112,6 +112,7 @@ int main(int argc, char** argv) {
         yyin_cpp_pclose(filename);
         if(parsecode) {
             errprintf("%:parse failed(%d)\n", parsecode);
+            return parsecode;
         } else {
             DEBUGSTMT('a', dump_astree(stderr, yyparse_astree); );
             //emit_sm_code(yyparse_astree);
