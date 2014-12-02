@@ -6,6 +6,8 @@ oc
 
 *.tok
 
+*.sym
+
 *.ast
 
 *.output
