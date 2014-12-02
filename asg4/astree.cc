@@ -124,27 +124,42 @@ void dump_astree(FILE* outfile, astree* root) {
     fflush(NULL);
 }
 
-static void write_node(ofstream& out, astree* node) {
-    out << get_yytname(node->symbol) << " "
-        << node->lexinfo->c_str() << " "
-        << "(" << node->filenr << ":"
-               << node->linenr << "."
-               << node->offset << ") "
-        << "{" << node->block_number << "} ";
-    const auto& auto_node = node->node->find(node->lexinfo);
-    assert(auto_node != node->node->end());
+void print_symbol_table(ofstream& out, symbol_table foo) {
+    out << "{";
+    for (const auto& i: foo) {
+        out << *i.first << ": " << i.second << ", ";
+    }
+    out << "}" << endl;
+}
 
-    out << " (" << auto_node->second->filenr << ":"
-               << auto_node->second->linenr << "."
-               << auto_node->second->offset << ") ";
+static void write_node(ofstream& out, astree* node, int depth) {
+    if (node->node == nullptr)
+        return;
+    //print_symbol_table(out, *node->node);
+    const auto& auto_node = node->node->find(node->lexinfo);
+    out << std::string(depth * 3, ' ');
+    out << get_yytname(node->symbol);
+    if (node->symbol == TOK_STRUCT) {
+        out << " " << node->children[0]->lexinfo->c_str() << " ";
+    } else {
+        out << " " << node->lexinfo->c_str() << " ";
+    }
+    out << "(" << node->filenr << ":"
+        << node->linenr << "."
+        << node->offset << ") "
+        << "{" << node->block_number << "} ";
+    if (auto_node != node->node->end()) {
+        out << "(" << auto_node->second->filenr << ":"
+            << auto_node->second->linenr << "."
+            << auto_node->second->offset << ") ";
+    }
     out << endl;
 }
 
 static void write_astree_rec(ofstream& out, astree* root, int depth) {
-    if(root == NULL) return;
-    out << std::string(depth * 3, ' ');
-    write_node(out, root);
-    for(size_t child = 0; child < root->children.size(); ++child) {
+    if (root == NULL) return;
+    write_node(out, root, depth);
+    for (size_t child = 0; child < root->children.size(); ++child) {
         write_astree_rec(out, root->children[child], depth + 1);
     }
 }
@@ -155,16 +170,16 @@ void write_astree(ofstream& out, astree* root) {
 
 void yyprint(FILE* outfile, unsigned short toknum, astree* yyvaluep) {
     DEBUGF('f', "toknum = %d, yyvaluep = %p\n", toknum, yyvaluep);
-    if(is_defined_token(toknum)) {
+    if (is_defined_token(toknum)) {
         dump_node(outfile, yyvaluep);
-    }else {
+    } else {
         fprintf(outfile, "%s(%d)\n", get_yytname(toknum), toknum);
     }
     fflush(NULL);
 }
 
 void free_ast(astree* root) {
-    while(not root->children.empty()) {
+    while (not root->children.empty()) {
         astree* child = root->children.back();
         root->children.pop_back();
         free_ast(child);
