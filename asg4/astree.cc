@@ -149,7 +149,7 @@ static void write_node(ofstream& out, astree* node, int depth) {
         << node->offset << ") "
         << "{" << node->block_number << "} ";
 
-    write_attributes(out, node->attributes, nullptr);
+    write_attributes(out, node->attributes, nullptr, nullptr);
 
     if (auto_node != node->node->end()) {
         out << "(" << auto_node->second->filenr << ":"

@@ -12,15 +12,16 @@ struct astree;
 using namespace std;
 
 struct astree {
-   int symbol;               // token code
-   size_t filenr;            // index into filename stack
-   size_t linenr;            // line number from source code
-   size_t offset;            // offset of token with current line
-   const string* lexinfo;    // pointer to lexical information
-   vector<astree*> children; // children of this n-way node
-   attr_bitset attributes;
-   int block_number;
-   symbol_table* node;
+    int symbol;
+    size_t filenr;
+    size_t linenr;
+    size_t offset;
+    const string* lexinfo;
+    vector<astree*> children;
+    attr_bitset attributes;
+    int block_number;
+    symbol_table* node;
+    const string* struct_name;
 };
 
 astree* new_astree(int symbol, int filenr, int linenr, int offset,
