@@ -132,6 +132,8 @@ void print_symbol_table(ofstream& out, symbol_table foo) {
     out << "}" << endl;
 }
 
+const string* STRUCT_NAME = nullptr;
+
 static void write_node(ofstream& out, astree* node, int depth) {
     if (node->node == nullptr)
         return;
@@ -149,7 +151,12 @@ static void write_node(ofstream& out, astree* node, int depth) {
         << node->offset << ") "
         << "{" << node->block_number << "} ";
 
-    write_attributes(out, node->attributes, nullptr, nullptr);
+    const string* field_name = nullptr;
+    if (node->attributes[ATTR_field]) {
+        assert(STRUCT_NAME != nullptr);
+        field_name = STRUCT_NAME;
+    }
+    write_attributes(out, node->attributes, field_name, STRUCT_NAME);
 
     if (auto_node != node->node->end()) {
         out << "(" << auto_node->second->filenr << ":"
@@ -161,10 +168,12 @@ static void write_node(ofstream& out, astree* node, int depth) {
 
 static void write_astree_rec(ofstream& out, astree* root, int depth) {
     if (root == NULL) return;
+    if (root->symbol == TOK_STRUCT) {STRUCT_NAME = root->children[0]->lexinfo;}
     write_node(out, root, depth);
     for (size_t child = 0; child < root->children.size(); ++child) {
         write_astree_rec(out, root->children[child], depth + 1);
     }
+    if (root->symbol == TOK_STRUCT) {STRUCT_NAME = nullptr;}
 }
 
 void write_astree(ofstream& out, astree* root) {

@@ -251,19 +251,6 @@ void parse_node(astree* node) {
     node->attributes = s->attributes;
 }
 
-void _write_symbol(ostream& out, symbol_table* sym_table,
-                   const string* s) {
-    const auto& node = sym_table->find(s);
-    assert(node != sym_table->end());
-    out << "fields" << "@" << *s <<"{"
-        << ":fnr " << node->second->filenr  << ", "
-        << ":lnr " << node->second->linenr  << ", "
-        << ":off " << node->second->offset  << ", "
-        << ":bnr " << node->second->blocknr << ", ";
-    out << ":fields " << node->second->fields;
-    out << "}" << endl;
-}
-
 void parse_struct_child(astree* node, const string* name,
                         symbol_table* fields) {
     if (node == nullptr) return;
@@ -310,6 +297,19 @@ void parse_function(astree* node) {
     //set node's attributes to that of its first child
     assert(node->children[0] != nullptr);
     node->attributes |= node->children[0]->attributes;
+
+    //set function's paramlist to all be ATTR_param
+    for (size_t i = 0; i < node->children[1]->children.size(); i++) {
+        astree* child = node->children[1]->children[i];
+
+        child->children[0]->attributes |= child->attributes;
+        child->children[0]->attributes.set(ATTR_param);
+
+        assert (child->node != nullptr);
+        const auto& auto_node = child->node->find(child->children[0]->lexinfo);
+        assert (auto_node != node->node->end());
+        auto_node->second->attributes = child->children[0]->attributes;
+    }
 }
 
 void parse_tree(astree* node) {
@@ -323,6 +323,7 @@ void parse_tree(astree* node) {
     for (size_t child = 0; child < node->children.size(); ++child) {
         parse_tree(node->children[child]);
     }
+    cout << "parse_tree: " << get_yytname(node->symbol) << endl;
     switch (node->symbol) {
         case TOK_FUNCTION:  parse_function(node);
                             parse_node(node);
