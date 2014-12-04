@@ -89,11 +89,17 @@ void write_symbol(ofstream& out, astree* node, symbol_table* sym_table,
         << sym->blocknr << "} ";
     const string* struct_name = nullptr;
     if (sym->attributes[ATTR_struct]) {
-        if (sym->attributes[ATTR_function]) {
-            struct_name = node->children[0]->lexinfo;
+        if (sym->attributes[ATTR_function] || sym->attributes[ATTR_array]) {
+            if (node->symbol == TOK_BRKKRB){
+                struct_name = node->children[0]->lexinfo;
+            }
+            else {
+                
+            }
         } else {
             const auto& auto_struct = struct_stack->find(node->lexinfo);
             assert(auto_struct != struct_stack->end());
+            assert(node->lexinfo != nullptr);
             struct_name = node->lexinfo;
         }
     }
@@ -146,11 +152,15 @@ void write_struct(ofstream& out, astree* node, int depth) {
 
 void write_tree(ofstream& out, astree* node, int depth) {
     switch (node->symbol) {
-        case TOK_STRUCT:    write_struct(out, node, depth);
-                            break;
+        case TOK_STRUCT:    if (!node->attributes[ATTR_array]) {
+                                write_struct(out, node, depth);
+                                break;
+                            }
         default:            write_node(out, node, depth);
-                            for(size_t child = 0; child < node->children.size(); ++child) {
-                                write_tree(out, node->children[child], depth+1);
+                            if (node->children.empty()) break;
+                            for (astree* child: node->children) {
+                                assert(child != nullptr);
+                                write_tree(out, child, depth+1);
                             }
     }
 }
@@ -234,6 +244,18 @@ void print_symbol_table(ostream& out, symbol_table foo) {
     out << "}" << endl;
 }
 
+void parse_array(astree* node) {
+    node->lexinfo = node->children[1]->lexinfo;
+
+    node->attributes |= node->attributes;
+    node->attributes |= node->children[0]->attributes;
+
+    const auto& auto_sym = node->node->find(node->lexinfo);
+    assert(auto_sym != node->node->end());
+    symbol* sym = auto_sym->second;
+    sym->attributes |= node->attributes;
+}
+
 void parse_node(astree* node) {
     if (node == nullptr) return;
 
@@ -249,6 +271,11 @@ void parse_node(astree* node) {
     node->node = symbol_stack[blocknr];
     node->block_number = s->blocknr;
     node->attributes = s->attributes;
+
+    switch (node->symbol) {
+        case TOK_BRKKRB:    parse_array(node);
+                            break;
+    }
 }
 
 void parse_struct_child(astree* node, const string* name,
@@ -323,7 +350,6 @@ void parse_tree(astree* node) {
     for (size_t child = 0; child < node->children.size(); ++child) {
         parse_tree(node->children[child]);
     }
-    cout << "parse_tree: " << get_yytname(node->symbol) << endl;
     switch (node->symbol) {
         case TOK_FUNCTION:  parse_function(node);
                             parse_node(node);

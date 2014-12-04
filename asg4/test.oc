@@ -1,5 +1,7 @@
 struct foobar {int foo; char bar;}
 
-mybutt fac (int n, int o, int q) {
+foobar fac (int n, int o, int q) {
+    foobar f = null;
+    foobar[] a = null;
     return new foobar();
 }
