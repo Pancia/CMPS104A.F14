@@ -1,7 +1,19 @@
 struct foobar {int foo; char bar;}
 
 foobar fac (int n, int o, int q) {
-    foobar f = null;
-    foobar[] a = null;
+    int x = o / q;
+    n = x + 2;
+    while (n > 5) {
+        if (o != 2) {
+            break;
+        }
+    }
+    return q;
     return new foobar();
 }
+
+string s = "Hello World\n";
+
+int n = 5;
+
+struct barfool {foobar f; string s;}

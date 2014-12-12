@@ -13,6 +13,7 @@
 #include "auxlib.h"
 #include "lyutils.h"
 #include "stringset.h"
+#include "code_generator.h"
 
 using namespace std;
 ofstream tok_file;
@@ -149,6 +150,11 @@ int main(int argc, char** argv) {
         ast_file.open(make_filename(filename, ".ast"), ios::out);
         write_astree(ast_file, yyparse_astree);
         ast_file.close();
+
+        ofstream oil_file;
+        oil_file.open(make_filename(filename, ".oil"), ios::out);
+        gen_oil(oil_file, yyparse_astree, 0);
+        oil_file.close();
     }
     return get_exitstatus();
 }

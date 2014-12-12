@@ -19,3 +19,5 @@ yyparse.cc
 yyparse.h
 
 *.deps
+
+*.oil

@@ -3,6 +3,12 @@
 
 using namespace std;
 
+template <typename T>
+void output(ofstream& out, T arg) {
+    out << arg;
+    out.flush();
+}
+
 vector<symbol_table*> symbol_stack(16, nullptr);
 symbol_table* struct_stack = new symbol_table();
 
@@ -75,7 +81,7 @@ string get_attributes(attr_bitset attr, const string* field_name,
 
 void write_attributes(ofstream& out, attr_bitset attr,
                       const string* field_name, const string* struct_name) {
-    out << get_attributes(attr, field_name, struct_name);
+    output(out, get_attributes(attr, field_name, struct_name));
 }
 
 void write_symbol(ofstream& out, astree* node, symbol_table* sym_table,
@@ -90,11 +96,11 @@ void write_symbol(ofstream& out, astree* node, symbol_table* sym_table,
     const string* struct_name = nullptr;
     if (sym->attributes[ATTR_struct]) {
         if (sym->attributes[ATTR_function] || sym->attributes[ATTR_array]) {
-            if (node->symbol == TOK_BRKKRB){
+            if (node->symbol == TOK_BRKKRB) {
                 struct_name = node->children[0]->lexinfo;
             }
             else {
-                
+
             }
         } else {
             const auto& auto_struct = struct_stack->find(node->lexinfo);
