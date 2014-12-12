@@ -8,6 +8,10 @@ symbol_table* struct_stack = new symbol_table();
 
 int blocknr = 0;
 
+/*FUNCTION: get_attributes
+PURPOSE: Prints the correct attributes based on the attr_bitset attr
+that is passed in.
+*/
 string get_attributes(attr_bitset attr, const string* field_name,
                       const string* struct_name) {
     string out;
@@ -73,11 +77,17 @@ string get_attributes(attr_bitset attr, const string* field_name,
     return out;
 }
 
+/*FUNCTION: write_attributes
+PURPOSE: Writes the attributes in the default format
+*/
 void write_attributes(ofstream& out, attr_bitset attr,
                       const string* field_name, const string* struct_name) {
     out << get_attributes(attr, field_name, struct_name);
 }
 
+/*FUNCTION: write_symbol
+PURPOSE: Writes a symbol in the default format
+*/
 void write_symbol(ofstream& out, astree* node, symbol_table* sym_table,
                   const string* s) {
     const auto& auto_sym = sym_table->find(s);
@@ -106,6 +116,9 @@ void write_symbol(ofstream& out, astree* node, symbol_table* sym_table,
     write_attributes(out, sym->attributes, nullptr, struct_name);
 }
 
+/*FUNCTION: write_node
+PURPOSE: Prints the node in the default format
+*/
 void write_node(ofstream& out, astree* node, int depth){
     if (node == nullptr)
         return;
@@ -120,6 +133,9 @@ void write_node(ofstream& out, astree* node, int depth){
     out << endl;
 }
 
+/*FUNCTION: write_struct_field
+PURPOSE: Prints the node in the format of a struct field.
+*/
 void write_struct_field(ofstream& out, astree* node, int depth,
                         const string* name) {
     out << std::string(depth * 3, ' ')
@@ -133,6 +149,9 @@ void write_struct_field(ofstream& out, astree* node, int depth,
     out << endl;
 }
 
+/*FUNCTION: write_struct
+PURPOSE: Prints the node in the format of a struct.
+*/
 void write_struct(ofstream& out, astree* node, int depth) {
     out << std::string(depth * 3, ' ') << *node->children[0]->lexinfo
         << " ("
@@ -150,6 +169,10 @@ void write_struct(ofstream& out, astree* node, int depth) {
     }
 }
 
+/*FUNCTION: write_tree
+PURPOSE: Prints out the astree* node. Has a special case to handle
+if the node has the token for structs.
+*/
 void write_tree(ofstream& out, astree* node, int depth) {
     switch (node->symbol) {
         case TOK_STRUCT:    if (!node->attributes[ATTR_array]) {
@@ -165,6 +188,9 @@ void write_tree(ofstream& out, astree* node, int depth) {
     }
 }
 
+/*FUNCTION: get_node_attr
+PURPOSE: Sets node's attributes based on it's tokens.
+*/
 attr_bitset get_node_attr(astree* node) {
     attr_bitset attr = node->attributes;
 
@@ -220,6 +246,10 @@ attr_bitset get_node_attr(astree* node) {
     return attr;
 }
 
+/*FUNCTION: new_symbol
+PURPOSE: Creates a new symbol pointer with the information of the
+node that is passed in.
+*/
 symbol* new_symbol(astree* node, int blocknr) {
     symbol* s = new symbol();
 
@@ -236,6 +266,9 @@ symbol* new_symbol(astree* node, int blocknr) {
     return s;
 }
 
+/*FUNCTION: print_symbol_table
+PURPOSE: Prints out the symbol table
+*/
 void print_symbol_table(ostream& out, symbol_table foo) {
     out << "{";
     for (const auto& i: foo) {
@@ -244,6 +277,10 @@ void print_symbol_table(ostream& out, symbol_table foo) {
     out << "}" << endl;
 }
 
+/*FUNCTION: parse_array
+PURPOSE: Parses a node that has the array function and fills in
+it's fields accordingly.
+*/
 void parse_array(astree* node) {
     node->lexinfo = node->children[1]->lexinfo;
 
@@ -256,6 +293,11 @@ void parse_array(astree* node) {
     sym->attributes |= node->attributes;
 }
 
+/*FUNCTION: parse_node
+PURPOSE: Parses all nodes that are not functions or 
+structs. Handles the special case that the node has
+the token indicating an array.
+*/
 void parse_node(astree* node) {
     if (node == nullptr) return;
 
@@ -278,6 +320,10 @@ void parse_node(astree* node) {
     }
 }
 
+/*FUNCTION: parse_struct_child
+PURPOSE: Parses the node and creates a symbol. It sets the correct
+attributes (field) and updates the symbol_table* fields accordingly.
+*/
 void parse_struct_child(astree* node, const string* name,
                         symbol_table* fields) {
     if (node == nullptr) return;
@@ -298,6 +344,11 @@ void parse_struct_child(astree* node, const string* name,
     parse_struct_child(first_child, name, fields);
 }
 
+/*FUNCTION: parse_struct
+PURPOSE: Handles the node if it is a struct by giving it (and it's
+children) the correct attributes. Calls parse_struct_child to give
+the node's children the corret information
+*/
 void parse_struct(astree* node) {
     const string* struct_name = node->children[0]->lexinfo;
     const auto& auto_node = struct_stack->find(struct_name);
@@ -318,6 +369,10 @@ void parse_struct(astree* node) {
     struct_stack->insert(symbol_entry(struct_name, sym));
 }
 
+/*FUNCTION: get_attributes
+PURPOSE: Handles the node if it is a function by giving it (and it's
+children) the correct attributes.
+*/
 void parse_function(astree* node) {
     assert(node != nullptr);
 
@@ -339,6 +394,10 @@ void parse_function(astree* node) {
     }
 }
 
+/*FUNCTION: parse_tree
+PURPOSE: Takes the astree* node and calls the correct functions based on
+the tokens it has.
+*/
 void parse_tree(astree* node) {
     vector<symbol_table*>::iterator it;
     switch (node->symbol) {

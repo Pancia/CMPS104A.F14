@@ -17,6 +17,10 @@
 using namespace std;
 ofstream tok_file;
 
+/*FUNCTION: scan_opts
+PURPOSE: Scans the input and changes flags so the correct
+information is printed, such as debug.
+*/
 int scan_opts(int argc, char** argv) {
     int option;
     opterr = 0;;;
@@ -41,6 +45,10 @@ int scan_opts(int argc, char** argv) {
     return optind;
 }
 
+/*FUNCTION: make_filename
+PURPOSE: Creates the filename for the file.
+EX: make_filename(test.oc, .str) -> test.str
+*/
 string make_filename(char* filename, string ending){
     string delimiter =".";
     size_t pos = 0;
@@ -53,6 +61,9 @@ string make_filename(char* filename, string ending){
 
 const string CPP = "/usr/bin/cpp";
 
+/*FUNCTION: scan
+PURPOSE: Creates the .tok file
+*/
 void scan(char* filename) {
     tok_file.open(make_filename(filename, ".tok"), ios::out);
     assert(tok_file.is_open());
@@ -65,6 +76,9 @@ void scan(char* filename) {
     tok_file.close();
 }
 
+/*FUNCTION: yyin_cpp_popen
+PURPOSE: Opens a pipe and runs the cpp on the file.
+*/
 string yyin_cpp_popen(char* filename) {
     string yyin_cpp_command;
 
@@ -80,12 +94,19 @@ string yyin_cpp_popen(char* filename) {
     return yyin_cpp_command;
 }
 
+/*FUNCTION: yyin_cpp_pclose
+PURPOSE: Closes the file and prints a status
+*/
 void yyin_cpp_pclose(string filename) {
     int pclose_rc = pclose(yyin);
     eprint_status(filename.c_str(), pclose_rc);
     if(pclose_rc != 0) set_exitstatus(EXIT_FAILURE);
 }
 
+/*FUNCTION: main
+PURPOSE: Creates all output files and calls the appropriate
+functions.
+*/
 int main(int argc, char** argv) {
     set_execname(argv[0]);
     int parsecode = 0;

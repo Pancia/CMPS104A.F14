@@ -10,6 +10,9 @@
 #include "stringset.h"
 #include "lyutils.h"
 
+/*FUNCTION: new_astree
+PURPOSE: Makes a new astree* with the parameters that are passed in
+*/
 astree* new_astree(int symbol, int filenr, int linenr, int offset,
                    const char* lexinfo) {
     astree* tree = new astree();
@@ -45,6 +48,9 @@ astree* new_astree(int symbol, int filenr, int linenr, int offset,
     return tree;
 }
 
+/*FUNCTION: adopt1
+PURPOSE: root adopts child.
+*/
 astree* adopt1(astree* root, astree* child) {
     root->children.push_back(child);
     DEBUGF('a', "%p(%s) adopting %p(%s)\n",
@@ -53,12 +59,18 @@ astree* adopt1(astree* root, astree* child) {
     return root;
 }
 
+/*FUNCTION: adopt2
+PURPOSE: root adopts left and right
+*/
 astree* adopt2(astree* root, astree* left, astree* right) {
     adopt1(root, left);
     adopt1(root, right);
     return root;
 }
 
+/*FUNCTION: adopt3
+PURPOSE: root adopts left, middle, and right
+*/
 astree* adopt3(astree* root, astree* left, astree* middle,
                astree* right) {
     adopt1(root, left);
@@ -67,6 +79,9 @@ astree* adopt3(astree* root, astree* left, astree* middle,
     return root;
 }
 
+/*FUNCTION: adopt4
+PURPOSE: root adopts c1, c2, c3, and c4
+*/
 astree* adopt4(astree* root, astree* c1, astree* c2,
                astree* c3, astree* c4) {
     adopt1(root, c1);
@@ -76,12 +91,18 @@ astree* adopt4(astree* root, astree* c1, astree* c2,
     return root;
 }
 
+/*FUNCTION: adopt1sym
+PURPOSE: root adopts child and sets root's symbol to symbol.
+*/
 astree* adopt1sym(astree* root, astree* child, int symbol) {
     root = adopt1(root, child);
     root->symbol = symbol;
     return root;
 }
 
+/*FUNCTION: adopt2sym
+PURPOSE: root adopts child1 and child2 and sets root's symbol to symbol.
+*/
 astree* adopt2sym(astree* root, astree* child1, astree* child2,
                   int symbol) {
     root = adopt1(root, child1);
@@ -90,11 +111,17 @@ astree* adopt2sym(astree* root, astree* child1, astree* child2,
     return root;
 }
 
+/*FUNCTION: upd_tree_symbol
+PURPOSE: tree->symbol is updated to symbol
+*/
 astree* upd_tree_symbol(astree* tree, int symbol) {
     tree->symbol = symbol;
     return tree;
 }
 
+/*FUNCTION: dump_node
+PURPOSE: Prints out the node
+*/
 static void dump_node(FILE* outfile, astree* node) {
     fprintf(outfile, "%p->{%s(%d) %ld:%ld.%03ld \"%s\" [",
             node, get_yytname(node->symbol), node->symbol,
@@ -109,6 +136,9 @@ static void dump_node(FILE* outfile, astree* node) {
     fprintf(outfile, "]}");
 }
 
+/*FUNCTION: upd_astree_rec
+PURPOSE: prints out the astree recursively
+*/
 static void dump_astree_rec(FILE* outfile, astree* root, int depth) {
     if(root == NULL) return;
     fprintf(outfile, "%*s%s ", depth * 3, "", root->lexinfo->c_str());
@@ -119,11 +149,17 @@ static void dump_astree_rec(FILE* outfile, astree* root, int depth) {
     }
 }
 
+/*FUNCTION: dump_astree
+PURPOSE: prints out the astree
+*/
 void dump_astree(FILE* outfile, astree* root) {
     dump_astree_rec(outfile, root, 0);
     fflush(NULL);
 }
 
+/*FUNCTION: print_symbol_table
+PURPOSE: prints the symbol table
+*/
 void print_symbol_table(ofstream& out, symbol_table foo) {
     out << "{";
     for (const auto& i: foo) {
@@ -134,6 +170,9 @@ void print_symbol_table(ofstream& out, symbol_table foo) {
 
 const string* STRUCT_NAME = nullptr;
 
+/*FUNCTION: write_node
+PURPOSE: writes the node to the ofstream& out
+*/
 static void write_node(ofstream& out, astree* node, int depth) {
     if (node->node == nullptr)
         return;
@@ -166,6 +205,9 @@ static void write_node(ofstream& out, astree* node, int depth) {
     out << endl;
 }
 
+/*FUNCTION: write_astree_rec
+PURPOSE: writes astree recursively
+*/
 static void write_astree_rec(ofstream& out, astree* root, int depth) {
     if (root == NULL) return;
     if (root->symbol == TOK_STRUCT) {STRUCT_NAME = root->children[0]->lexinfo;}
@@ -176,10 +218,16 @@ static void write_astree_rec(ofstream& out, astree* root, int depth) {
     if (root->symbol == TOK_STRUCT) {STRUCT_NAME = nullptr;}
 }
 
+/*FUNCTION: write_astree
+PURPOSE: writes the astree
+*/
 void write_astree(ofstream& out, astree* root) {
     write_astree_rec(out, root, 0);
 }
 
+/*FUNCTION: yyprint
+PURPOSE: print the token or node
+*/
 void yyprint(FILE* outfile, unsigned short toknum, astree* yyvaluep) {
     DEBUGF('f', "toknum = %d, yyvaluep = %p\n", toknum, yyvaluep);
     if (is_defined_token(toknum)) {
@@ -190,6 +238,9 @@ void yyprint(FILE* outfile, unsigned short toknum, astree* yyvaluep) {
     fflush(NULL);
 }
 
+/*FUNCTION: free_ast
+PURPOSE: frees the astree root
+*/
 void free_ast(astree* root) {
     while (not root->children.empty()) {
         astree* child = root->children.back();
@@ -202,11 +253,17 @@ void free_ast(astree* root) {
     delete root;
 }
 
+/*FUNCTION: free_ast2
+PURPOSE: Frees 2 astrees
+*/
 void free_ast2(astree* tree1, astree* tree2) {
     free_ast(tree1);
     free_ast(tree2);
 }
 
+/*FUNCTION: free_ast3
+PURPOSE: frees 3 astrees
+*/
 void free_ast3(astree* tree1, astree* tree2, astree* tree3) {
     free_ast(tree1);
     free_ast(tree2);
