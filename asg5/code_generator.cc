@@ -35,6 +35,8 @@ string mangle_name(astree* node, string old_name) {
                                 break;
             case TOK_NUMBER:    new_name = old_name;
                                 break;
+            case TOK_FUNCTION:  new_name = "__" + old_name;
+                                break;
             default:            new_name = "_" + to_string(node->block_number)
                                     + "_" + *node->lexinfo;
         }
@@ -123,6 +125,7 @@ void gen_strconst(ofstream& out, astree* node, int depth) {
 
 void gen_return(ofstream& out, astree* node, int depth) {
     astree* return_val = node->children[0];
+    out << string(depth * 3, ' ');
     if (return_val != nullptr) {
         if (return_val->symbol == TOK_IDENT) {
             out << "return "
@@ -139,7 +142,7 @@ void gen_return(ofstream& out, astree* node, int depth) {
     }
 }
 
-void gen_conditional(ofstream& out, astree* node, int depth, astree* extra) {
+void gen_binary(ofstream& out, astree* node, int depth) {
     astree* left = node->children[0];
     astree* right = node->children[1];
 
@@ -147,7 +150,12 @@ void gen_conditional(ofstream& out, astree* node, int depth, astree* extra) {
         << " = " << mangle_name(left, *left->lexinfo)
         << " " << *node->lexinfo
         << " " << mangle_name(right, *right->lexinfo)
-        << endl;
+        << ";" << endl;
+}
+
+void gen_conditional(ofstream& out, astree* node, int depth, astree* extra) {
+    //TODO: Handle case where is node is a unary operator (ie: do switch/if-else)
+    gen_binary(out, node, depth);
 
     out << "if (!b" << reg_counter-1
         << ") goto break_"
@@ -174,24 +182,131 @@ void gen_while(ofstream& out, astree* node, int depth) {
         << ":" << endl;
 }
 
+void gen_call(ofstream& out, astree* node, int depth) {
+    node->children[0]->symbol = TOK_FUNCTION;
+    out << mangle_name(node->children[0], *node->children[0]->lexinfo)
+        << " (";
+
+    for (size_t i = 1; i < node->children.size(); i++) {
+        astree* arg = node->children[i];
+        out << mangle_name(arg, *arg->lexinfo);
+        if (i+1 != node->children.size()) {
+            out << ", ";
+        }
+    }
+    out << ");" << endl;
+}
+
+string to_reg_type(string s) {
+    if (s == "char") {
+        return "c";
+    } else if (s == "int") {
+        return "i";
+    } else if (s == "string") {
+        return "s";
+    } else {
+        return "i";
+    }
+}
+
+void gen_eq(ofstream& out, astree* node, int depth) {
+    astree* left = node->children[0];
+    astree* right = node->children[1];
+    if (left->symbol != TOK_IDENT) {
+        switch (right->symbol) {
+            case TOK_IDENT:         out << string(depth*3, ' ')
+                                        << *left->lexinfo
+                                        << " " << mangle_name(left->children[0], *left->children[0]->lexinfo)
+                                        << " = " << mangle_name(right, *right->lexinfo)
+                                        << ";" << endl;
+                                    break;
+            case TOK_NUMBER:
+            case TOK_CHARCONST:
+            case TOK_STRCONST:
+            case TOK_TRUE:
+            case TOK_FALSE:         out << string(depth*3, ' ')
+                                        << *left->lexinfo << " "
+                                        << mangle_name(left->children[0], *left->children[0]->lexinfo)
+                                        << " = " << *right->lexinfo
+                                        << ";" << endl;
+                                    break;
+            case TOK_NEW:           break;
+            default:                out << string(depth*3, ' ')
+                                        << *left->lexinfo
+                                        << " " << to_reg_type(*left->lexinfo) << reg_counter++
+                                        << " = ";
+                                    gen_call(out, right, depth);
+                                    out << string(depth*3, ' ')
+                                        << *left->lexinfo << " "
+                                        << mangle_name(left->children[0], *left->children[0]->lexinfo)
+                                        << " = " << to_reg_type(*left->lexinfo) << reg_counter-1
+                                        << ";" << endl;
+                                    break;
+        }
+    } else {
+        switch (right->symbol) {
+            case TOK_IDENT:         out << string(depth*3, ' ')
+                                        << mangle_name(left, *left->lexinfo)
+                                        << " = " << mangle_name(right, *right->lexinfo)
+                                        << ";" << endl;
+                                    break;
+            case TOK_NUMBER:
+            case TOK_CHARCONST:
+            case TOK_STRCONST:
+            case TOK_TRUE:
+            case TOK_FALSE:         out << string(depth*3, ' ')
+                                        << mangle_name(left, *left->lexinfo)
+                                        << " = " << *right->lexinfo
+                                        << ";" << endl;
+                                    break;
+            case TOK_NEW:           break;
+            default:                out << string(depth*3, ' ')
+                                        << *left->lexinfo
+                                        << " " << to_reg_type(*left->lexinfo) << reg_counter++
+                                        << " = ";
+                                    gen_call(out, right, depth);
+                                    out << string(depth*3, ' ')
+                                        << mangle_name(left->children[0], *left->children[0]->lexinfo)
+                                        << " = " << to_reg_type(*left->lexinfo) << reg_counter-1
+                                        << ";" << endl;
+                                    break;
+        }
+    }
+}
+
 void gen_oil_stuff(ofstream& out, astree* node, int depth, astree* extra) {
     switch (node->symbol) {
         case TOK_BLOCK:     for (astree* child: node->children) {
-                                gen_oil_stuff(out, child, depth, extra);
+                                gen_oil_stuff(out, child, depth+1, extra);
                             }
                             break;
 
         case TOK_WHILE:     gen_while(out, node, depth);
                             break;
 
-        case '=':           out << '='
-                                << endl;
+        case TOK_IF:        gen_binary(out, node->children[0], depth);
+                            out << "if (!b" << reg_counter-1 << ") "
+                                << "goto fi_"
+                                << to_string(node->filenr) << "_"
+                                << to_string(node->linenr) << "_"
+                                << to_string(node->offset)
+                                << ";" << endl;
+                            gen_oil_stuff(out, node->children[1], depth, extra);
+                            out << "fi_"
+                                << to_string(node->filenr) << "_"
+                                << to_string(node->linenr) << "_"
+                                << to_string(node->offset)
+                                << ";" << endl;
+                            break;
+
+        case '=':           gen_eq(out, node, depth);
                             break;
 
         case TOK_RETURN:    gen_return(out, node, depth);
                             break;
 
-        default:            out << get_yytname(node->symbol) << endl;
+        default:            out << string(depth * 3, ' ');
+                            out << get_yytname(node->symbol) << endl;
                             break;
     }
 }
@@ -219,7 +334,7 @@ void gen_function(ofstream& out, astree* node, int depth) {
         << "{" << endl;
 
     astree* block = node->children[2];
-    gen_oil_stuff(out, block, depth+1, nullptr);
+    gen_oil_stuff(out, block, depth, nullptr);
 
     out << "}" << endl;
 }
@@ -254,11 +369,3 @@ void gen_oil(ofstream& out, astree* root, int depth) {
         }
     }
 }
-
-
-/*
-'=' = (13:9.9) {0} (13:9.9)
-      TOK_STRING string (13:9.0) {0} string (13:9.0)
-         TOK_DECLID s (13:9.7) {0} lval (13:9.7)
-      TOK_STRCONST "Hello World\n" (13:9.11) {0} string const (13:9.11)
-*/

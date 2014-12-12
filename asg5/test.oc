@@ -3,13 +3,22 @@ struct foobar {int foo; char bar;}
 foobar fac (int n, int o, int q) {
     int x = o / q;
     n = x + 2;
+    int yy = n;
+    q = n;
     while (n > 5) {
         if (o != 2) {
-            break;
+            n = n - 1;
         }
     }
     return q;
     return new foobar();
+    int qq = 5;
+}
+
+int cxz (int a) {
+    int b = fac(5, 3, 2);
+    b = fac(2, 3, 4);
+    return b;
 }
 
 string s = "Hello World\n";
