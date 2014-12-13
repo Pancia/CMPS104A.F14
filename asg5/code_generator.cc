@@ -105,6 +105,9 @@ string convert_type(astree* node, const string* struct_name) {
     return new_type;
 }
 
+/*
+Generates oil output for structs
+*/
 void gen_struct(ofstream& out, astree* child, int depth) {
     astree* struct_name = child->children[0];
     out << "struct "
@@ -126,6 +129,7 @@ void gen_struct(ofstream& out, astree* child, int depth) {
     out << "};" << endl;
 }
 
+//Generates oil output for string constants
 void gen_strconst(ofstream& out, astree* node, int depth) {
     if (node->symbol == '=') {
         if (node->children[1]->symbol == TOK_STRCONST) {
@@ -142,6 +146,7 @@ void gen_strconst(ofstream& out, astree* node, int depth) {
     }
 }
 
+//Generates oil output for return
 void gen_return(ofstream& out, astree* node, int depth) {
     astree* return_val = node->children[0];
     out << string(depth * 3, ' ');
@@ -162,6 +167,7 @@ void gen_return(ofstream& out, astree* node, int depth) {
     }
 }
 
+//Generates oil content for binary conditionals such as x>y
 void gen_binary(ofstream& out, astree* node, int depth) {
     astree* left = node->children[0];
     astree* right = node->children[1];
@@ -173,6 +179,7 @@ void gen_binary(ofstream& out, astree* node, int depth) {
         << ";" << endl;
 }
 
+//Generates oil content for unary operators such as !u
 void gen_unary(ofstream& out, astree* node, int depth) {
     astree* expr = node->children[0];
 
@@ -182,6 +189,7 @@ void gen_unary(ofstream& out, astree* node, int depth) {
         << ";" << endl;
 }
 
+//Generates oil content for conditional statements
 void gen_conditional(ofstream& out, astree* node,
                      int depth, astree* extra) {
     size_t size = node->children.size();
@@ -197,6 +205,7 @@ void gen_conditional(ofstream& out, astree* node,
     }
 }
 
+//Generates oil content for while loops
 void gen_while(ofstream& out, astree* node, int depth) {
     out << mangle_name(node, *node->lexinfo) << endl;
 
@@ -220,6 +229,7 @@ void gen_while(ofstream& out, astree* node, int depth) {
         << ":" << endl;
 }
 
+//Generates oil content for call statements
 void gen_call(ofstream& out, astree* node, int depth) {
     node->children[0]->symbol = TOK_FUNCTION; //sometimes null
     out << string(depth * 3, ' ')
@@ -236,6 +246,7 @@ void gen_call(ofstream& out, astree* node, int depth) {
     out << ")";
 }
 
+//Generates oil content for expressions
 void gen_expression(ofstream& out, astree* node, int depth){
     //handle first child
     //recur if +-/*
@@ -290,6 +301,8 @@ void gen_expression(ofstream& out, astree* node, int depth){
     }
 }
 
+//Generates the register type for the input string.
+//if s="int" then it returns "i"
 string to_reg_type(string s) {
     if (s == "char") {
         return "c";
@@ -302,6 +315,7 @@ string to_reg_type(string s) {
     }
 }
 
+//Generates oil content for new, such as int[] x = new int [5]
 void gen_new(ofstream& out, astree* node, int depth) {
     astree* new_type = node->children[0];
     if (new_type->symbol == TOK_TYPEID) {
@@ -328,6 +342,7 @@ void gen_new(ofstream& out, astree* node, int depth) {
     }
 }
 
+//Generates oil content for assignment statements such as x = y or x = y + 2
 void gen_eq(ofstream& out, astree* node, int depth) {
     astree* left = node->children[0];
     astree* right = node->children[1];
@@ -544,6 +559,7 @@ void gen_eq(ofstream& out, astree* node, int depth) {
     }
 }
 
+//Generates oil content for all situations by calling the correct function
 void gen_oil_stuff(ofstream& out, astree* node,
                    int depth, astree* extra) {
     switch (node->symbol) {
@@ -591,6 +607,8 @@ void gen_oil_stuff(ofstream& out, astree* node,
     }
 }
 
+//Generate oil content for function declarations such as:
+//void funct (int x) {x = !x;}
 void gen_function(ofstream& out, astree* node, int depth) {
     //gen function type and name
     astree* return_type = node->children[0];
@@ -626,6 +644,7 @@ void gen_function(ofstream& out, astree* node, int depth) {
     out << "}" << endl;
 }
 
+//Generates all content for the oil file
 void gen_oil(ofstream& out, astree* root, int depth) {
     //gen all structs
     for (astree* child: root->children) {
