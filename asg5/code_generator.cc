@@ -342,7 +342,8 @@ void gen_new(ofstream& out, astree* node, int depth) {
     }
 }
 
-//Generates oil content for assignment statements such as x = y or x = y + 2
+//Generates oil content for assignment statements
+//  such as x = y or x = y + 2
 void gen_eq(ofstream& out, astree* node, int depth) {
     astree* left = node->children[0];
     astree* right = node->children[1];
@@ -559,7 +560,8 @@ void gen_eq(ofstream& out, astree* node, int depth) {
     }
 }
 
-//Generates oil content for all situations by calling the correct function
+//Generates oil content for all situations
+//  by calling the correct function
 void gen_oil_stuff(ofstream& out, astree* node,
                    int depth, astree* extra) {
     switch (node->symbol) {

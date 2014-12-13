@@ -391,7 +391,8 @@ void parse_function(astree* node) {
         child->children[0]->attributes.set(ATTR_param);
 
         assert (child->node != nullptr);
-        const auto& auto_node = child->node->find(child->children[0]->lexinfo);
+        const auto& auto_node
+            = child->node->find(child->children[0]->lexinfo);
         assert (auto_node != node->node->end());
         auto_node->second->attributes = child->children[0]->attributes;
     }
