@@ -19,6 +19,11 @@ size_t reg_counter = 1;
 
 void gen_oil_stuff(ofstream& out, astree* node, int depth, astree* extra);
 
+/**
+ *  We take in a node and an old_name,
+ *  and sprinkle in old_name with information
+ *  from node based on the project specs.
+ */
 string mangle_name(astree* node, string old_name) {
     string new_name;
     int symbol = node->symbol;
@@ -66,6 +71,14 @@ string mangle_name(astree* node, string old_name) {
     return new_name;
 }
 
+/**
+ *  convert_type takes in a node, and a struct_name,
+ *  if the node's lexinfo is not a known primitive type,
+ *  then struct_name is used and is assumed to be the name
+ *      of a struct,
+ *  otherwise we slightly modify the primitives to match
+ *      the project specifications.
+ */
 string convert_type(astree* node, const string* struct_name) {
     string old_type = *node->lexinfo;
     string new_type;
@@ -392,6 +405,7 @@ void gen_oil_stuff(ofstream& out, astree* node, int depth, astree* extra) {
 }
 
 void gen_function(ofstream& out, astree* node, int depth) {
+    //gen function type and name
     astree* return_type = node->children[0];
     astree* name = return_type->children[0];
     name->symbol = TOK_FUNCTION;
@@ -399,6 +413,7 @@ void gen_function(ofstream& out, astree* node, int depth) {
         << " " << mangle_name(name, *name->lexinfo)
         << " (" << endl;
 
+    //gen function parameter list
     depth++;
     astree* paramlist = node->children[1];
     for (size_t i = 0; i < paramlist->children.size(); i++) {
@@ -413,6 +428,7 @@ void gen_function(ofstream& out, astree* node, int depth) {
     out << ")" << endl
         << "{" << endl;
 
+    //gen function block
     astree* block = node->children[2];
     gen_oil_stuff(out, block, depth, nullptr);
 
