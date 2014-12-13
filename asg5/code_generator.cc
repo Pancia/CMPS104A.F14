@@ -178,10 +178,16 @@ void gen_unary(ofstream& out, astree* node, int depth) {
 
 void gen_conditional(ofstream& out, astree* node, int depth, astree* extra) {
     //TODO: Handle case where is node is a unary operator (ie: do switch/if-else)
-    if (node->children.size() == 2) {
+    size_t size = node->children.size();
+    if (size == 2) {
         gen_binary(out, node, depth);
-    } else {
+    } else if (size==1){
         gen_unary(out, node, depth);
+    } else {
+        out << "char b" << reg_counter++
+        << " = "
+        << mangle_name(node, *node->lexinfo)
+        << ";" << endl;
     }
 }
 
