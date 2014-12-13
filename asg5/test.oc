@@ -1,32 +1,10 @@
-struct foobar {int foo; char bar;}
-
 foobar fac (int n, int o, int q) {
-    int x = o / q;
-    zz = 2 + 5;
-    n = x + 2;
-    int yy = n;
-    int func_call = 2 + function(x, y);
-    func_call2 = 2 + funct (x) + 3 + 4;
-    func_call3 = z + fun();
-    q = n;
-    while (n > 5) {
-        if (o != 2) {
-            n = n - 1;
-        }
-    }
-    return q;
-    return new foobar();
-    int qq = 5;
+    foobar fb = 5;
+    fb = new foobar[7];
 }
 
 int cxz (int a) {
-    int b = fac(5, 3, 2);
-    b = fac(2, 3, 4);
-    return b;
+    foobar fb = new foobar();
+    string s = new string("foo");
+    int[] ia = new int[5];
 }
-
-string s = "Hello World\n";
-
-int n = 5;
-
-struct barfool {foobar f; string s;}
