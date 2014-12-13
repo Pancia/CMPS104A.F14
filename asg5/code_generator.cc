@@ -17,7 +17,8 @@ using namespace std;
 
 size_t reg_counter = 1;
 
-void gen_oil_stuff(ofstream& out, astree* node, int depth, astree* extra);
+void gen_oil_stuff(ofstream& out, astree* node,
+                   int depth, astree* extra);
 
 /**
  *  We take in a node and an old_name,
@@ -42,15 +43,17 @@ string mangle_name(astree* node, string old_name) {
                                 break;
             case TOK_FUNCTION:  new_name = "__" + old_name;
                                 break;
-            default:            new_name = "_" + to_string(node->block_number)
-                                    + "_" + *node->lexinfo;
+            default:            new_name = "_" +
+                                          to_string(node->block_number)
+                                           + "_" + *node->lexinfo;
         }
     } else {
         switch (symbol) {
             case TOK_STRUCT:    new_name = "s_" + old_name;
                                 break;
                                 //STRUCT FIELD
-            case TOK_TYPEID:    new_name = "f_" + *node->lexinfo + "_" + old_name;
+            case TOK_TYPEID:    new_name = "f_" + *node->lexinfo
+                                           + "_" + old_name;
                                 break;
             case TOK_WHILE:
             case TOK_IF:
@@ -60,7 +63,8 @@ string mangle_name(astree* node, string old_name) {
                                     + to_string(node->linenr) + "_"
                                     + to_string(node->offset) + ":;";
                                 break;
-            case TOK_DECLID:    new_name = "_" + to_string(node->block_number)
+            case TOK_DECLID:    new_name = "_"
+                                    + to_string(node->block_number)
                                     + "_" + *node->lexinfo;
                                 break;
             default:            new_name = "__" + old_name;
@@ -126,7 +130,8 @@ void gen_strconst(ofstream& out, astree* node, int depth) {
     if (node->symbol == '=') {
         if (node->children[1]->symbol == TOK_STRCONST) {
             out << "char* "
-                << mangle_name(node, *node->children[0]->children[0]->lexinfo)
+                << mangle_name(node,
+                        *node->children[0]->children[0]->lexinfo)
                 << " = " << *node->children[1]->lexinfo
                 << endl;
         }
@@ -148,7 +153,7 @@ void gen_return(ofstream& out, astree* node, int depth) {
         } else {
             out << "return "
                 << *return_val->lexinfo
-                //<< " " << mangle_name(return_val->children[0], 
+                //<< " " << mangle_name(return_val->children[0],
                 //*return_val->children[0]->lexinfo)
                 << ";" << endl;
         }
@@ -177,8 +182,8 @@ void gen_unary(ofstream& out, astree* node, int depth) {
         << ";" << endl;
 }
 
-void gen_conditional(ofstream& out, astree* node, int depth, astree* extra) {
-    //TODO: Handle case where is node is a unary operator (ie: do switch/if-else)
+void gen_conditional(ofstream& out, astree* node,
+                     int depth, astree* extra) {
     size_t size = node->children.size();
     if (size == 2) {
         gen_binary(out, node, depth);
@@ -217,7 +222,7 @@ void gen_while(ofstream& out, astree* node, int depth) {
 
 void gen_call(ofstream& out, astree* node, int depth) {
     node->children[0]->symbol = TOK_FUNCTION; //sometimes null
-    out << string(depth * 3, ' ') 
+    out << string(depth * 3, ' ')
         << mangle_name(node->children[0], *node->children[0]->lexinfo)
         << " (";
 
@@ -232,9 +237,6 @@ void gen_call(ofstream& out, astree* node, int depth) {
 }
 
 void gen_expression(ofstream& out, astree* node, int depth){
-    //cases caught: x=y+2
-    //TODO: gotta catch: x=y+2+y+2, x=funct(fucnt(x, 2), 2+3+3+3+funct(x, y))
-
     //handle first child
     //recur if +-/*
     astree* first = node->children[0];
@@ -306,12 +308,16 @@ void gen_new(ofstream& out, astree* node, int depth) {
         out << "struct " << *new_type->lexinfo
             << "* p" << reg_counter++ << " = "
             << "xcalloc (1, sizeof (struct "
-            << mangle_name(new_type, *new_type->lexinfo) << "));" << endl;
+            << mangle_name(new_type, *new_type->lexinfo)
+            << "));" << endl;
     } else if (node->symbol == TOK_NEWARRAY) {
-        out << convert_type(node->children[0], node->children[0]->lexinfo)
+        out << convert_type(node->children[0],
+                            node->children[0]->lexinfo)
             << "* p" << reg_counter++
-            << " = xcalloc (" << *node->children[1]->lexinfo << ", sizeof ("
-            << mangle_name(node->children[0], *node->children[0]->lexinfo )
+            << " = xcalloc (" << *node->children[1]->lexinfo
+            << ", sizeof ("
+            << mangle_name(node->children[0],
+                          *node->children[0]->lexinfo )
             << "));" << endl;
     } else if (node->symbol == TOK_NEWSTRING) {
         out << "char* p" << reg_counter++
@@ -328,202 +334,238 @@ void gen_eq(ofstream& out, astree* node, int depth) {
     if (left->symbol != TOK_IDENT) {
         switch (right->symbol) {
             //case int x=y, char y=z
-            case TOK_IDENT:         out << string(depth*3, ' ')
-                                        << convert_type(left, left->lexinfo)
-                                        << " " << mangle_name(left->children[0], *left->children[0]->lexinfo)
-                                        << " = " << mangle_name(right, *right->lexinfo)
-                                        << ";" << endl;
-                                    break;
-            //case int x=2, string x="string", char x='c'
+            case TOK_IDENT:     out << string(depth*3, ' ')
+                                << convert_type(left, left->lexinfo)
+                                    << " " << mangle_name(
+                                            left->children[0],
+                                            *left->children[0]->lexinfo)
+                                    << " = " << mangle_name(right,
+                                                    *right->lexinfo)
+                                    << ";" << endl;
+                                break;
             case TOK_NUMBER:
             case TOK_CHARCONST:
             case TOK_STRCONST:
             case TOK_NIL:
             case TOK_TRUE:
-            case TOK_FALSE:         out << string(depth*3, ' ')
-                                        << convert_type(left, left->lexinfo) << " "
-                                        << mangle_name(left->children[0], *left->children[0]->lexinfo)
-                                        << " = " << *right->lexinfo
-                                        << ";" << endl;
-                                    break;
+            case TOK_FALSE:     out << string(depth*3, ' ')
+                                << convert_type(left, left->lexinfo)
+                                    << " "
+                                    << mangle_name(left->children[0],
+                                            *left->children[0]->lexinfo)
+                                    << " = " << *right->lexinfo
+                                    << ";" << endl;
+                                break;
             case TOK_ORD:
-            case TOK_CHR:           out << string(depth*3, ' ')
-                                        << convert_type(left, left->lexinfo)
-                                        << " " << mangle_name(left->children[0],
-                                                             *left->children[0]->lexinfo)
-                                        << " = "
-                                        << mangle_name(right, *right->lexinfo)
-                                        << " (" << mangle_name(right->children[0],
-                                                              *right->children[0]->lexinfo);
-                                    out << ");" << endl;
-                                    break;
-            //case int [] x = new int [];
+            case TOK_CHR:       out << string(depth*3, ' ')
+                                << convert_type(left, left->lexinfo)
+                                    << " " << mangle_name(
+                                            left->children[0],
+                                            *left->children[0]->lexinfo)
+                                    << " = "
+                                    << mangle_name(right,
+                                                  *right->lexinfo)
+                                    << " ("
+                                    << mangle_name(
+                                          right->children[0],
+                                          *right->children[0]->lexinfo);
+                                out << ");" << endl;
+                                break;
+                                //case int [] x = new int [];
             case TOK_NEWARRAY:      gen_new(out, right, depth);
-                                    out << convert_type(left->children[0],
-                                                        left->children[0]->lexinfo)
-                                        << "* " << *left->children[1]->lexinfo
+                                    out << convert_type(
+                                            left->children[0],
+                                            left->children[0]->lexinfo)
+                                        << "* "
+                                        << *left->children[1]->lexinfo
                                         << " = p" << reg_counter-1
                                         << ";" << endl;
                                     break;
             case TOK_NEWSTRING:
-            case TOK_NEW:           gen_new(out, right, depth);
-                                    out << convert_type(left, left->lexinfo) << " "
-                                        << *left->children[0]->lexinfo
-                                        << " = p" << reg_counter-1
-                                        << ";" << endl;
-                                    break;
-            case '!':               out << string(depth*3, ' ')
-                                        << convert_type(left, left->lexinfo) << " "
-                                        << mangle_name(left->children[0], *left->children[0]->lexinfo)
-                                        << " = !" << mangle_name(right->children[0],
-                                                                 *right->children[0]->lexinfo)
-                                        << ";" << endl;
-                                    break;
-            //case int x = x + 2
-            //Do we have || and &&?
+            case TOK_NEW:       gen_new(out, right, depth);
+                                out << convert_type(left, left->lexinfo)
+                                    << " "
+                                    << *left->children[0]->lexinfo
+                                    << " = p" << reg_counter-1
+                                    << ";" << endl;
+                                break;
+            case '!':       out << string(depth*3, ' ')
+                            << convert_type(left, left->lexinfo) << " "
+                                << mangle_name(left->children[0],
+                                            *left->children[0]->lexinfo)
+                                << " = !"
+                                << mangle_name(
+                                        right->children[0],
+                                        *right->children[0]->lexinfo)
+                                << ";" << endl;
+                            break;
+                            //case int x = x + 2
+                            //Do we have || and &&?
             case '+':
-            case '-':               if (right->children.size() == 1) {
-                                        //its unary!
-                                        out << string(depth*3, ' ')
-                                            << convert_type(left, left->lexinfo) << " "
-                                            << mangle_name(left, *left->lexinfo)
-                                            << " = " << *right->lexinfo
-                                            << mangle_name(right->children[0],
-                                                          *right->children[0]->lexinfo)
-                                            << ";" << endl;
-                                        break;
-                                    }
+            case '-':       if (right->children.size() == 1) {
+                                //its unary!
+                                out << string(depth*3, ' ')
+                                    << convert_type(left, left->lexinfo)
+                                    << " "
+                                    << mangle_name(left, *left->lexinfo)
+                                    << " = " << *right->lexinfo
+                                    << mangle_name(right->children[0],
+                                           *right->children[0]->lexinfo)
+                                    << ";" << endl;
+                                break;
+                            }
             case '/':
-            case '*':               out << string(depth*3, ' ')
-                                        << convert_type(left, left->lexinfo)
-                                        << " " << to_reg_type(*left->lexinfo) << reg_counter++
-                                        << " = ";
-                                    gen_expression(out, right, depth);
-                                    out << ";" << endl;
-                                    out << string(depth*3, ' ')
-                                        << convert_type(left, left->lexinfo) << " "
-                                        << mangle_name(left->children[0], *left->children[0]->lexinfo)
-                                        << " = " << to_reg_type(*left->lexinfo) << reg_counter-1
-                                        << ";" << endl;
-                                    break;
-            //count also be tok_call?
-            default:                out << string(depth*3, ' ')
-                                        << convert_type(left, left->lexinfo)
-                                        << " " << to_reg_type(*left->lexinfo) << reg_counter++
-                                        << " = ";
-                                    gen_call(out, right, depth);
-                                    out << ";" << endl;
-                                    out << string(depth*3, ' ')
-                                        << convert_type(left, left->lexinfo) << " "
-                                        << mangle_name(left->children[0], *left->children[0]->lexinfo)
-                                        << " = " << to_reg_type(*left->lexinfo) << reg_counter-1
-                                        << ";" << endl;
-                                    break;
+            case '*':       out << string(depth*3, ' ')
+                            << convert_type(left, left->lexinfo)
+                                << " " << to_reg_type(*left->lexinfo)
+                                << reg_counter++
+                                << " = ";
+                            gen_expression(out, right, depth);
+                            out << ";" << endl;
+                            out << string(depth*3, ' ')
+                                << convert_type(left, left->lexinfo)
+                                << " "
+                                << mangle_name(left->children[0],
+                                        *left->children[0]->lexinfo)
+                                << " = " << to_reg_type(*left->lexinfo)
+                                << reg_counter-1
+                                << ";" << endl;
+                            break;
+                            //count also be tok_call?
+            default:        out << string(depth*3, ' ')
+                            << convert_type(left, left->lexinfo)
+                                << " " << to_reg_type(*left->lexinfo)
+                                << reg_counter++
+                                << " = ";
+                            gen_call(out, right, depth);
+                            out << ";" << endl;
+                            out << string(depth*3, ' ')
+                                << convert_type(left, left->lexinfo)
+                                << " "
+                                << mangle_name(left->children[0],
+                                        *left->children[0]->lexinfo)
+                                << " = " << to_reg_type(*left->lexinfo)
+                                << reg_counter-1
+                                << ";" << endl;
+                            break;
         }
     } else {
         switch (right->symbol) {
             //case x=y
-            case TOK_IDENT:         out << string(depth*3, ' ')
-                                        << mangle_name(left, *left->lexinfo)
-                                        << " = " << mangle_name(right, *right->lexinfo)
-                                        << ";" << endl;
-                                    break;
-            //case x=1, x='y', x="string"
+            case TOK_IDENT:     out << string(depth*3, ' ')
+                                << mangle_name(left, *left->lexinfo)
+                                    << " = " << mangle_name(right,
+                                            *right->lexinfo)
+                                    << ";" << endl;
+                                break;
+                                //case x=1, x='y', x="string"
             case TOK_NUMBER:
             case TOK_CHARCONST:
             case TOK_STRCONST:
             case TOK_NIL:
             case TOK_TRUE:
-            case TOK_FALSE:         out << string(depth*3, ' ')
-                                        << mangle_name(left, *left->lexinfo)
-                                        << " = " << *right->lexinfo
-                                        << ";" << endl;
-                                    break;
+            case TOK_FALSE:     out << string(depth*3, ' ')
+                                << mangle_name(left, *left->lexinfo)
+                                    << " = " << *right->lexinfo
+                                    << ";" << endl;
+                                break;
             case TOK_ORD:
-            case TOK_CHR:           out << string(depth*3, ' ')
-                                        << mangle_name(left, *left->lexinfo) << " = "
-                                        << mangle_name(right, *right->lexinfo)
-                                        << " (" << mangle_name(right->children[0],
-                                                              *right->children[0]->lexinfo);
-                                    out << ");" << endl;
-                                    break;
-            //case x=new Object()
+            case TOK_CHR:       out << string(depth*3, ' ')
+                                << mangle_name(left, *left->lexinfo)
+                                    << " = "
+                                    << mangle_name(right,
+                                            *right->lexinfo)
+                                    << " ("
+                                    << mangle_name(
+                                          right->children[0],
+                                          *right->children[0]->lexinfo);
+                                out << ");" << endl;
+                                break;
+                                //case x=new Object()
             case TOK_NEWARRAY:      gen_new(out, right, depth);
                                     out << *left->lexinfo
                                         << " = p" << reg_counter-1
                                         << ";" << endl;
                                     break;
             case TOK_NEWSTRING:
-            case TOK_NEW:           gen_new(out, right, depth);
-                                    out << *left->lexinfo
-                                        << " = p" << reg_counter-1
-                                        << ";" << endl;
-                                    break;
-            case '!':               out << string(depth*3, ' ')
-                                        << mangle_name(left, *left->lexinfo)
-                                        << " = " << *right->lexinfo
-                                        << mangle_name(right->children[0],
-                                                      *right->children[0]->lexinfo)
-                                        << ";" << endl;
-                                    break;
-            //case x = x + 2
-            //Do we have || and &&?
+            case TOK_NEW:       gen_new(out, right, depth);
+                                out << *left->lexinfo
+                                    << " = p" << reg_counter-1
+                                    << ";" << endl;
+                                break;
+            case '!':       out << string(depth*3, ' ')
+                            << mangle_name(left, *left->lexinfo)
+                                << " = " << *right->lexinfo
+                                << mangle_name(right->children[0],
+                                        *right->children[0]->lexinfo)
+                                << ";" << endl;
+                            break;
+                            //case x = x + 2
+                            //Do we have || and &&?
             case '+':
-            case '-':               if (right->children.size() == 1) {
-                                        //its unary!
-                                        out << string(depth*3, ' ')
-                                            << mangle_name(left, *left->lexinfo)
-                                            << " = " << *right->lexinfo
-                                            << mangle_name(right->children[0],
-                                                    *right->children[0]->lexinfo)
-                                            << ";" << endl;
-                                        break;
-                                    }
+            case '-':       if (right->children.size() == 1) {
+                                //its unary!
+                                out << string(depth*3, ' ')
+                                    << mangle_name(left, *left->lexinfo)
+                                    << " = " << *right->lexinfo
+                                    << mangle_name(right->children[0],
+                                           *right->children[0]->lexinfo)
+                                    << ";" << endl;
+                                break;
+                            }
             case '/':
-            case '*':               out << string(depth*3, ' ')
-                                        << "int " //do we want to hide this better?
-                                        << to_reg_type(*left->lexinfo) << reg_counter++
-                                        << " = ";
-                                    gen_expression(out, right, depth);
-                                    out << ";" << endl;
-                                    out << string(depth*3, ' ')
-                                        << mangle_name(left, *left->lexinfo)
-                                        << " = " << to_reg_type(*left->lexinfo) << reg_counter-1
-                                        << ";" << endl;
-                                    break;
-            default:                out << string(depth*3, ' ')
-                                        << *left->lexinfo
-                                        << " " << to_reg_type(*left->lexinfo) << reg_counter++
-                                        << " = ";
-                                    gen_call(out, right, depth);
-                                    out << ";" << endl;
-                                    out << string(depth*3, ' ')
-                                        << mangle_name(left, *left->lexinfo)
-                                        << " = " << to_reg_type(*left->lexinfo) << reg_counter-1
-                                        << ";" << endl;
-                                    break;
+            case '*':       out << string(depth*3, ' ')
+                            << "int " //do we want to hide this better?
+                                << to_reg_type(*left->lexinfo)
+                                << reg_counter++
+                                << " = ";
+                            gen_expression(out, right, depth);
+                            out << ";" << endl;
+                            out << string(depth*3, ' ')
+                                << mangle_name(left, *left->lexinfo)
+                                << " = " << to_reg_type(*left->lexinfo)
+                                << reg_counter-1
+                                << ";" << endl;
+                            break;
+            default:        out << string(depth*3, ' ')
+                            << *left->lexinfo
+                                << " " << to_reg_type(*left->lexinfo)
+                                << reg_counter++
+                                << " = ";
+                            gen_call(out, right, depth);
+                            out << ";" << endl;
+                            out << string(depth*3, ' ')
+                                << mangle_name(left, *left->lexinfo)
+                                << " = " << to_reg_type(*left->lexinfo)
+                                << reg_counter-1
+                                << ";" << endl;
+                            break;
         }
     }
 }
 
-void gen_oil_stuff(ofstream& out, astree* node, int depth, astree* extra) {
+void gen_oil_stuff(ofstream& out, astree* node,
+                   int depth, astree* extra) {
     switch (node->symbol) {
         case TOK_BLOCK:     for (astree* child: node->children) {
-                                gen_oil_stuff(out, child, depth+1, extra);
+                                gen_oil_stuff(out, child,
+                                              depth+1, extra);
                             }
                             break;
 
         case TOK_WHILE:     gen_while(out, node, 0);
                             break;
 
-        case TOK_IF:        gen_conditional(out, node->children[0], depth, extra);
+        case TOK_IF:        gen_conditional(out, node->children[0],
+                                            depth, extra);
                             out << "if (!b" << reg_counter-1 << ") "
                                 << "goto fi_"
                                 << to_string(node->filenr) << "_"
                                 << to_string(node->linenr) << "_"
                                 << to_string(node->offset)
                                 << ";" << endl;
-                            gen_oil_stuff(out, node->children[1], depth, extra);
+                            gen_oil_stuff(out, node->children[1],
+                                          depth, extra);
                             out << "fi_"
                                 << to_string(node->filenr) << "_"
                                 << to_string(node->linenr) << "_"
