@@ -216,7 +216,7 @@ void gen_while(ofstream& out, astree* node, int depth) {
 }
 
 void gen_call(ofstream& out, astree* node, int depth) {
-    node->children[0]->symbol = TOK_FUNCTION;
+    node->children[0]->symbol = TOK_FUNCTION; //sometimes null
     out << string(depth * 3, ' ') 
         << mangle_name(node->children[0], *node->children[0]->lexinfo)
         << " (";
@@ -338,6 +338,7 @@ void gen_eq(ofstream& out, astree* node, int depth) {
             case TOK_NUMBER:
             case TOK_CHARCONST:
             case TOK_STRCONST:
+            case TOK_NIL:
             case TOK_TRUE:
             case TOK_FALSE:         out << string(depth*3, ' ')
                                         << convert_type(left, left->lexinfo) << " "
@@ -431,6 +432,7 @@ void gen_eq(ofstream& out, astree* node, int depth) {
             case TOK_NUMBER:
             case TOK_CHARCONST:
             case TOK_STRCONST:
+            case TOK_NIL:
             case TOK_TRUE:
             case TOK_FALSE:         out << string(depth*3, ' ')
                                         << mangle_name(left, *left->lexinfo)
