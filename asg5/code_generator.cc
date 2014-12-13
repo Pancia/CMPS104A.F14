@@ -209,7 +209,8 @@ void gen_while(ofstream& out, astree* node, int depth) {
 
 void gen_call(ofstream& out, astree* node, int depth) {
     node->children[0]->symbol = TOK_FUNCTION;
-    out << mangle_name(node->children[0], *node->children[0]->lexinfo)
+    out << string(depth * 3, ' ') 
+        << mangle_name(node->children[0], *node->children[0]->lexinfo)
         << " (";
 
     for (size_t i = 1; i < node->children.size(); i++) {
@@ -502,7 +503,7 @@ void gen_oil_stuff(ofstream& out, astree* node, int depth, astree* extra) {
                             }
                             break;
 
-        case TOK_WHILE:     gen_while(out, node, depth);
+        case TOK_WHILE:     gen_while(out, node, 0);
                             break;
 
         case TOK_IF:        gen_conditional(out, node->children[0], depth, extra);
@@ -524,6 +525,12 @@ void gen_oil_stuff(ofstream& out, astree* node, int depth, astree* extra) {
                             break;
 
         case TOK_RETURN:    gen_return(out, node, depth);
+                            break;
+
+        case TOK_PROTOTYPE: break;
+
+        case TOK_CALL:      gen_call(out, node, depth);
+                            out << "; " << endl;
                             break;
 
         default:            out << string(depth * 3, ' ');
@@ -569,13 +576,16 @@ void gen_oil(ofstream& out, astree* root, int depth) {
         if (child->symbol == TOK_STRUCT)
             gen_struct(out, child, depth);
     }
+    out << "after structs" << endl;
     //gen all string consts
     for (astree* child: root->children) {
         gen_strconst(out, child, depth);
     }
+    out << "after string consts" << endl;
     //gen all global/top-level var decls
     for (astree* child: root->children) {
-        if (child->symbol == '=') {
+        if (child->symbol == '='
+            && child->children[0]->children.size() != 0) {
             astree* type = child->children[0];
             astree* declid = type->children[0];
             if (declid->symbol == TOK_DECLID
@@ -586,10 +596,23 @@ void gen_oil(ofstream& out, astree* root, int depth) {
             }
         }
     }
+    out << "after global" << endl;
     //gen all functions
     for (astree* child: root->children) {
         if (child->symbol == TOK_FUNCTION) {
             gen_function(out, child, depth);
         }
     }
+
+    out << "void __ocmain (void)" << endl << "{" << endl;
+    //gen all string consts
+    for (astree* child: root->children) {
+        if (child->symbol != TOK_FUNCTION
+            && child->symbol != TOK_STRUCT)
+            gen_oil_stuff(out, child, 1, nullptr);
+    }
+    out << "}" << endl;
+    out << "end" <<endl;
+
+
 }
