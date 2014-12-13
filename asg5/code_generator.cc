@@ -561,7 +561,7 @@ void gen_function(ofstream& out, astree* node, int depth) {
     //gen function parameter list
     depth++; int next = 2;
     astree* paramlist = node->children[1];
-    if (paramlist == TOK_PARAMLIST) {
+    if (paramlist->symbol == TOK_PARAMLIST) {
         for (size_t i = 0; i < paramlist->children.size(); i++) {
             astree* param_type = paramlist->children[i];
             astree* param = param_type->children[0];
