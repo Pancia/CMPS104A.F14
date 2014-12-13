@@ -197,6 +197,48 @@ void gen_call(ofstream& out, astree* node, int depth) {
     out << ");" << endl;
 }
 
+void gen_expression(ofstream& out, astree* node, int depth){
+    //cases caught: x=y+2, x=y+2+y+2, x=funct(fucnt(x, 2), 2+3+3+3+funct(x, y))
+    
+    //handle first child
+    switch (node->children[0]->symbol){
+        case TOK_IDENT: out << mangle_name(node->children[0], 
+                                            *node->children[0]->lexinfo) 
+                            << " " << *node->lexinfo << " ";
+                        break;
+
+        case TOK_STRCONST:
+        case TOK_CHARCONST:
+        case TOK_NUMBER:
+        case TOK_TRUE:
+        case TOK_FALSE: out << *node->children[0]->lexinfo << " " 
+                            << *node->lexinfo << " ";
+                        break;
+
+        case TOK_CALL: out << "im a call" << endl;
+                       break;
+    }
+
+    //handle second child
+    switch (node->children[1]->symbol){
+        case TOK_IDENT: out << mangle_name(node->children[1],
+                                           *node->children[1]->lexinfo) 
+                            << "; " << endl;
+                        break;
+
+        case TOK_STRCONST:
+        case TOK_CHARCONST:
+        case TOK_NUMBER:
+        case TOK_TRUE:
+        case TOK_FALSE: out << *node->children[1]->lexinfo << "; " 
+                            << endl;
+                        break;
+
+        case TOK_CALL: out << "im a call" << endl;
+                       break;
+    }
+}
+
 string to_reg_type(string s) {
     if (s == "char") {
         return "c";
@@ -214,12 +256,14 @@ void gen_eq(ofstream& out, astree* node, int depth) {
     astree* right = node->children[1];
     if (left->symbol != TOK_IDENT) {
         switch (right->symbol) {
+            //case int x=y, char y=z
             case TOK_IDENT:         out << string(depth*3, ' ')
                                         << *left->lexinfo
                                         << " " << mangle_name(left->children[0], *left->children[0]->lexinfo)
                                         << " = " << mangle_name(right, *right->lexinfo)
                                         << ";" << endl;
                                     break;
+            //case int x=2, string x="string", char x='c'
             case TOK_NUMBER:
             case TOK_CHARCONST:
             case TOK_STRCONST:
@@ -230,7 +274,25 @@ void gen_eq(ofstream& out, astree* node, int depth) {
                                         << " = " << *right->lexinfo
                                         << ";" << endl;
                                     break;
+            //case int [] x = new int [];
             case TOK_NEW:           break;
+            //case int x = x + 2
+            //Do we have || and &&?
+            case '+':
+            case '-':
+            case '/':
+            case '*':               out << string(depth*3, ' ')
+                                        << *left->lexinfo
+                                        << " " << to_reg_type(*left->lexinfo) << reg_counter++
+                                        << " = ";
+                                    gen_expression(out, right, depth);
+                                    out << string(depth*3, ' ')
+                                        << *left->lexinfo << " "
+                                        << mangle_name(left->children[0], *left->children[0]->lexinfo)
+                                        << " = " << to_reg_type(*left->lexinfo) << reg_counter-1
+                                        << ";" << endl;
+                                    break;
+            //count also be tok_call?
             default:                out << string(depth*3, ' ')
                                         << *left->lexinfo
                                         << " " << to_reg_type(*left->lexinfo) << reg_counter++
@@ -245,11 +307,13 @@ void gen_eq(ofstream& out, astree* node, int depth) {
         }
     } else {
         switch (right->symbol) {
+            //case x=y
             case TOK_IDENT:         out << string(depth*3, ' ')
                                         << mangle_name(left, *left->lexinfo)
                                         << " = " << mangle_name(right, *right->lexinfo)
                                         << ";" << endl;
                                     break;
+            //case x=1, x='y', x="string"
             case TOK_NUMBER:
             case TOK_CHARCONST:
             case TOK_STRCONST:
@@ -259,14 +323,30 @@ void gen_eq(ofstream& out, astree* node, int depth) {
                                         << " = " << *right->lexinfo
                                         << ";" << endl;
                                     break;
+            //case x=new Object()
             case TOK_NEW:           break;
+            //case x = x + 2
+            //Do we have || and &&?
+            case '+':
+            case '-':
+            case '/':
+            case '*':               out << string(depth*3, ' ')
+                                        << "int " //do we want to hide this better?
+                                        << to_reg_type(*left->lexinfo) << reg_counter++
+                                        << " = ";
+                                    gen_expression(out, right, depth);
+                                    out << string(depth*3, ' ')
+                                        << mangle_name(left, *left->lexinfo)
+                                        << " = " << to_reg_type(*left->lexinfo) << reg_counter-1
+                                        << ";" << endl;
+                                    break;
             default:                out << string(depth*3, ' ')
                                         << *left->lexinfo
                                         << " " << to_reg_type(*left->lexinfo) << reg_counter++
                                         << " = ";
                                     gen_call(out, right, depth);
                                     out << string(depth*3, ' ')
-                                        << mangle_name(left->children[0], *left->children[0]->lexinfo)
+                                        << mangle_name(left, *left->lexinfo)
                                         << " = " << to_reg_type(*left->lexinfo) << reg_counter-1
                                         << ";" << endl;
                                     break;

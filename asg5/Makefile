@@ -91,7 +91,7 @@ clean :
 		${patsubst %, ${test}.%, out err}}
 spotless : clean
 	- rm ${EXECBIN} *.str *.tok *.ast y.* *.err *.out
-	- rm *-*.oc *.oh *.log *.lexyacctrace *.sym
+	- rm *-*.oc *.oh *.log *.lexyacctrace *.sym *.oil
 
 #
 # Build the dependencies file using the C preprocessor

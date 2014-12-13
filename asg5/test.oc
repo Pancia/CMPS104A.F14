@@ -2,8 +2,12 @@ struct foobar {int foo; char bar;}
 
 foobar fac (int n, int o, int q) {
     int x = o / q;
+    zz = 2 + 5;
     n = x + 2;
     int yy = n;
+    int func_call = 2 + function(x, y);
+    func_call2 = 2 + funct (x) + 3 + 4;
+    func_call3 = z + fun();
     q = n;
     while (n > 5) {
         if (o != 2) {
