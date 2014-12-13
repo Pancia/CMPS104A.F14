@@ -559,22 +559,26 @@ void gen_function(ofstream& out, astree* node, int depth) {
         << " (" << endl;
 
     //gen function parameter list
-    depth++;
+    depth++; int next = 2;
     astree* paramlist = node->children[1];
-    for (size_t i = 0; i < paramlist->children.size(); i++) {
-        astree* param_type = paramlist->children[i];
-        astree* param = param_type->children[0];
-        out << string(depth * 3, ' ')
-            << convert_type(param_type, param_type->lexinfo)
-            << " " << mangle_name(param, *param->lexinfo);
-        if (i+1 != paramlist->children.size())
-            out << "," << endl;
+    if (paramlist == TOK_PARAMLIST) {
+        for (size_t i = 0; i < paramlist->children.size(); i++) {
+            astree* param_type = paramlist->children[i];
+            astree* param = param_type->children[0];
+            out << string(depth * 3, ' ')
+                << convert_type(param_type, param_type->lexinfo)
+                << " " << mangle_name(param, *param->lexinfo);
+            if (i+1 != paramlist->children.size())
+                out << "," << endl;
+        }
+    } else {
+        next = 1;
     }
     out << ")" << endl
         << "{" << endl;
 
     //gen function block
-    astree* block = node->children[2];
+    astree* block = node->children[next];
     gen_oil_stuff(out, block, depth, nullptr);
 
     out << "}" << endl;
