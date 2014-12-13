@@ -91,7 +91,8 @@ string convert_type(astree* node, const string* struct_name) {
     } else if (old_type == "string") {
         new_type = "char*";
     } else {
-        assert(struct_name != nullptr);
+        if (struct_name == nullptr)
+            return "ERR" + old_type;
         astree* a_struct = new astree();
         a_struct->symbol = TOK_STRUCT;
         a_struct->lexinfo = struct_name;

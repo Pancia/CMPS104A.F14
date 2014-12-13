@@ -192,8 +192,8 @@ static void write_node(ofstream& out, astree* node, int depth) {
 
     const string* field_name = nullptr;
     if (node->attributes[ATTR_field]) {
-        assert(STRUCT_NAME != nullptr);
-        field_name = STRUCT_NAME;
+        if (STRUCT_NAME != nullptr)
+            field_name = STRUCT_NAME;
     }
     write_attributes(out, node->attributes, field_name, STRUCT_NAME);
 
