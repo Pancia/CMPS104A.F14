@@ -210,7 +210,9 @@ PURPOSE: writes astree recursively
 */
 static void write_astree_rec(ofstream& out, astree* root, int depth) {
     if (root == NULL) return;
-    if (root->symbol == TOK_STRUCT) {STRUCT_NAME = root->children[0]->lexinfo;}
+    if (root->symbol == TOK_STRUCT) {
+        STRUCT_NAME = root->children[0]->lexinfo;
+    }
     write_node(out, root, depth);
     for (size_t child = 0; child < root->children.size(); ++child) {
         write_astree_rec(out, root->children[child], depth + 1);
