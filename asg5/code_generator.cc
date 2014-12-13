@@ -50,7 +50,8 @@ string mangle_name(astree* node, string old_name) {
             case TOK_STRUCT:    new_name = "s_" + old_name;
                                 break;
                                 //STRUCT FIELD
-            case TOK_TYPEID:    new_name = "f_" + *node->lexinfo + "_" + old_name;
+            case TOK_TYPEID:    new_name = 
+                                    "f_" + *node->lexinfo + "_" + old_name;
                                 break;
             case TOK_WHILE:
             case TOK_IF:
@@ -101,6 +102,9 @@ string convert_type(astree* node, const string* struct_name) {
     return new_type;
 }
 
+/*
+Generates oil output for structs
+*/
 void gen_struct(ofstream& out, astree* child, int depth) {
     astree* struct_name = child->children[0];
     out << "struct "
@@ -122,6 +126,7 @@ void gen_struct(ofstream& out, astree* child, int depth) {
     out << "};" << endl;
 }
 
+//Generates oil output for string constants
 void gen_strconst(ofstream& out, astree* node, int depth) {
     if (node->symbol == '=') {
         if (node->children[1]->symbol == TOK_STRCONST) {
@@ -137,6 +142,7 @@ void gen_strconst(ofstream& out, astree* node, int depth) {
     }
 }
 
+//Generates oil output for return
 void gen_return(ofstream& out, astree* node, int depth) {
     astree* return_val = node->children[0];
     out << string(depth * 3, ' ');
@@ -157,6 +163,7 @@ void gen_return(ofstream& out, astree* node, int depth) {
     }
 }
 
+//Generates oil content for binary conditionals such as x>y
 void gen_binary(ofstream& out, astree* node, int depth) {
     astree* left = node->children[0];
     astree* right = node->children[1];
@@ -168,6 +175,7 @@ void gen_binary(ofstream& out, astree* node, int depth) {
         << ";" << endl;
 }
 
+//Generates oil content for unary operators such as !u
 void gen_unary(ofstream& out, astree* node, int depth) {
     astree* expr = node->children[0];
 
@@ -177,8 +185,10 @@ void gen_unary(ofstream& out, astree* node, int depth) {
         << ";" << endl;
 }
 
+//Generates oil content for conditional statements
 void gen_conditional(ofstream& out, astree* node, int depth, astree* extra) {
-    //TODO: Handle case where is node is a unary operator (ie: do switch/if-else)
+    //TODO: Handle case where is node is a unary operator 
+    //(ie: do switch/if-else)
     size_t size = node->children.size();
     if (size == 2) {
         gen_binary(out, node, depth);
@@ -192,6 +202,7 @@ void gen_conditional(ofstream& out, astree* node, int depth, astree* extra) {
     }
 }
 
+//Generates oil content for while loops
 void gen_while(ofstream& out, astree* node, int depth) {
     out << mangle_name(node, *node->lexinfo) << endl;
 
@@ -215,6 +226,7 @@ void gen_while(ofstream& out, astree* node, int depth) {
         << ":" << endl;
 }
 
+//Generates oil content for call statements
 void gen_call(ofstream& out, astree* node, int depth) {
     node->children[0]->symbol = TOK_FUNCTION; //sometimes null
     out << string(depth * 3, ' ') 
@@ -231,6 +243,7 @@ void gen_call(ofstream& out, astree* node, int depth) {
     out << ")";
 }
 
+//Generates oil content for expressions
 void gen_expression(ofstream& out, astree* node, int depth){
     //cases caught: x=y+2
     //TODO: gotta catch: x=y+2+y+2, x=funct(fucnt(x, 2), 2+3+3+3+funct(x, y))
@@ -288,6 +301,8 @@ void gen_expression(ofstream& out, astree* node, int depth){
     }
 }
 
+//Generates the register type for the input string.
+//if s="int" then it returns "i"
 string to_reg_type(string s) {
     if (s == "char") {
         return "c";
@@ -300,6 +315,7 @@ string to_reg_type(string s) {
     }
 }
 
+//Generates oil content for new, such as int[] x = new int [5]
 void gen_new(ofstream& out, astree* node, int depth) {
     astree* new_type = node->children[0];
     if (new_type->symbol == TOK_TYPEID) {
@@ -322,6 +338,7 @@ void gen_new(ofstream& out, astree* node, int depth) {
     }
 }
 
+//Generates oil content for assignment statements such as x = y or x = y + 2
 void gen_eq(ofstream& out, astree* node, int depth) {
     astree* left = node->children[0];
     astree* right = node->children[1];
@@ -330,8 +347,10 @@ void gen_eq(ofstream& out, astree* node, int depth) {
             //case int x=y, char y=z
             case TOK_IDENT:         out << string(depth*3, ' ')
                                         << convert_type(left, left->lexinfo)
-                                        << " " << mangle_name(left->children[0], *left->children[0]->lexinfo)
-                                        << " = " << mangle_name(right, *right->lexinfo)
+                                        << " " << mangle_name(left->children[0],
+                                        *left->children[0]->lexinfo)
+                                        << " = " << mangle_name(right,
+                                        *right->lexinfo)
                                         << ";" << endl;
                                     break;
             //case int x=2, string x="string", char x='c'
@@ -506,6 +525,7 @@ void gen_eq(ofstream& out, astree* node, int depth) {
     }
 }
 
+//Generates oil content for all situations by calling the correct function
 void gen_oil_stuff(ofstream& out, astree* node, int depth, astree* extra) {
     switch (node->symbol) {
         case TOK_BLOCK:     for (astree* child: node->children) {
@@ -549,6 +569,8 @@ void gen_oil_stuff(ofstream& out, astree* node, int depth, astree* extra) {
     }
 }
 
+//Generate oil content for function declarations such as:
+//void funct (int x) {x = !x;}
 void gen_function(ofstream& out, astree* node, int depth) {
     //gen function type and name
     astree* return_type = node->children[0];
@@ -584,6 +606,7 @@ void gen_function(ofstream& out, astree* node, int depth) {
     out << "}" << endl;
 }
 
+//Generates all content for the oil file
 void gen_oil(ofstream& out, astree* root, int depth) {
     //gen all structs
     for (astree* child: root->children) {
