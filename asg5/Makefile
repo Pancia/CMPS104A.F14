@@ -71,7 +71,7 @@ ${CYGEN} ${HYGEN} : ${YSOURCES}
 # Submit the files.
 #
 submit :
-	submit cmps104a-wm.f14 asg4 ${ALLSRC}
+	submit cmps104a-wm.f14 asg5 ${ALLSRC}
 
 #
 # Make a listing from all of the sources

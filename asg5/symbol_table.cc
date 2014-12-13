@@ -81,7 +81,8 @@ string get_attributes(attr_bitset attr, const string* field_name,
 PURPOSE: Writes the attributes in the default format
 */
 void write_attributes(ofstream& out, attr_bitset attr,
-                      const string* field_name, const string* struct_name) {
+                      const string* field_name,
+                      const string* struct_name) {
     out << get_attributes(attr, field_name, struct_name);
 }
 
@@ -99,7 +100,8 @@ void write_symbol(ofstream& out, astree* node, symbol_table* sym_table,
         << sym->blocknr << "} ";
     const string* struct_name = nullptr;
     if (sym->attributes[ATTR_struct]) {
-        if (sym->attributes[ATTR_function] || sym->attributes[ATTR_array]) {
+        if (sym->attributes[ATTR_function]
+                || sym->attributes[ATTR_array]) {
             if (node->symbol == TOK_BRKKRB){
                 struct_name = node->children[0]->lexinfo;
             }
@@ -160,7 +162,8 @@ void write_struct(ofstream& out, astree* node, int depth) {
         << node->children[0]->offset
         << ")"
         << " {" << node->children[0]->block_number << "} ";
-    write_attributes(out, node->attributes, nullptr, node->children[0]->lexinfo);
+    write_attributes(out, node->attributes,
+                     nullptr, node->children[0]->lexinfo);
     out << endl;
 
     for(size_t child = 1; child < node->children.size(); ++child) {
@@ -294,7 +297,7 @@ void parse_array(astree* node) {
 }
 
 /*FUNCTION: parse_node
-PURPOSE: Parses all nodes that are not functions or 
+PURPOSE: Parses all nodes that are not functions or
 structs. Handles the special case that the node has
 the token indicating an array.
 */

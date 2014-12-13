@@ -33,7 +33,8 @@ struct symbol {
 
 void parse_tree(astree* node);
 void write_attributes(ofstream& out, attr_bitset attr,
-                      const string* field_name, const string* struct_name);
+                      const string* field_name,
+                      const string* struct_name);
 void write_tree(ofstream& out, astree* node, int depth);
 
 #endif
