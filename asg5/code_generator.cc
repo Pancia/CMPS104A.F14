@@ -148,7 +148,8 @@ void gen_return(ofstream& out, astree* node, int depth) {
         } else {
             out << "return "
                 << *return_val->lexinfo
-                << " " << mangle_name(return_val->children[0], *return_val->children[0]->lexinfo)
+                //<< " " << mangle_name(return_val->children[0], 
+                //*return_val->children[0]->lexinfo)
                 << ";" << endl;
         }
     } else {
